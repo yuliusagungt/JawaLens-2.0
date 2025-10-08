@@ -2,13 +2,11 @@ import os
 import sys
 import subprocess
 
-# Pastikan semua dependensi penting terinstal (fallback Hugging Face)
-required_libs = ["joblib", "opencv-python", "scikit-learn", "pandas", "numpy", "Pillow"]
-for lib in required_libs:
-    try:
-        __import__(lib)
-    except ModuleNotFoundError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
+try:
+    import joblib
+except ModuleNotFoundError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "joblib"])
+
 
 # app.py - Aplikasi Streamlit Transliterasi Aksara Jawa
 import streamlit as st
@@ -220,6 +218,7 @@ st.markdown("""
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
