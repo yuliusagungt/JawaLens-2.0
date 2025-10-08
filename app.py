@@ -214,7 +214,7 @@ else:
                 mime="text/csv"
             )
 
-        st.success(f"Hasil lengkap tersimpan di: {output_folder}")
+        #st.success(f"Hasil lengkap tersimpan di: {output_folder}")
         
         # Detail per baris
         with st.expander("Lihat Detail Prediksi per Baris"):
@@ -232,7 +232,7 @@ else:
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p><b>Aplikasi Transliterasi Aksara Jawa</b></p>
+    <p><b>JawaLens 2.0</b></p>
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
