@@ -2,10 +2,10 @@
 import streamlit as st
 import os
 import tempfile
-import gdown
 import joblib
 from PIL import Image
-import backend  # Import semua fungsi dari backend.py
+from huggingface_hub import hf_hub_download
+import backend  # pastikan backend.py ada di repo
 
 # ============================================================
 # Konfigurasi Halaman
@@ -18,32 +18,23 @@ st.markdown("<hr style='border:1px solid #850510;'>", unsafe_allow_html=True)
 # Lokasi folder hasil
 # ============================================================
 TEMP_FOLDER = tempfile.mkdtemp()
-GDRIVE_FOLDER = os.path.join(TEMP_FOLDER, "JawaLens")
-if not os.path.exists(GDRIVE_FOLDER):
-    os.makedirs(GDRIVE_FOLDER, exist_ok=True)
+OUTPUT_BASE = os.path.join(TEMP_FOLDER, "JawaLens")
+os.makedirs(OUTPUT_BASE, exist_ok=True)
 
 # ============================================================
-# Unduh dan muat model dari Google Drive
+# Unduh dan muat model dari Hugging Face Hub
 # ============================================================
-#MODEL_URL = "https://drive.google.com/uc?id=18xMwkdeT9NYGY-YS6iYGMT2grUgq48Hw"
+REPO_ID = "yuliusat/JawaLens2.0"
+MODEL_FILENAME = "Model.pkl"
 
-MODEL_URL = "https://drive.google.com/uc?id=1BogrIsasSSAQGH44JTJhPD6unYQJotcV"
-MODEL_PATH = os.path.join(GDRIVE_FOLDER, "Model.pkl")
-
-if not os.path.exists(MODEL_PATH):
-    with st.spinner("Memuat model ..."):
-        try:
-            gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
-            st.success("Model berhasil dimuat!")
-        except Exception as e:
-            st.error(f"Error muat model: {e}")
-            st.stop()
-
-try:
-    model = joblib.load(MODEL_PATH)
-except Exception as e:
-    st.error(f"Error load model: {e}")
-    st.stop()
+with st.spinner("🔄 Memuat model dari Hugging Face Hub..."):
+    try:
+        MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=MODEL_FILENAME)
+        model = joblib.load(MODEL_PATH)
+        st.success("✅ Model berhasil dimuat dari Hugging Face Hub!")
+    except Exception as e:
+        st.error(f"Gagal memuat model: {e}")
+        st.stop()
 
 # ============================================================
 # Upload input
@@ -66,9 +57,8 @@ else:
         input_path = temp.name
 
     # siapkan folder output
-    output_folder = os.path.join(GDRIVE_FOLDER, "Hasil_" + os.path.splitext(uploaded_file.name)[0])
+    output_folder = os.path.join(OUTPUT_BASE, "Hasil_" + os.path.splitext(uploaded_file.name)[0])
     os.makedirs(output_folder, exist_ok=True)
-
 
     # tampilkan gambar
     col1, col2 = st.columns([1, 3])
@@ -80,17 +70,13 @@ else:
     with col2:
         st.info(f"**File:** {uploaded_file.name}\n\n**Ukuran:** {w} x {h} px")
 
-    # Progress bar
     progress_bar = st.progress(0)
     status_text = st.empty()
 
     try:
-        # ------------------------------------------------------------
         # Tahap 1: Segmentasi dan Preprocessing
-        # ------------------------------------------------------------
         status_text.text("Tahap 1/5: Preprocessing dan Segmentasi...")
         progress_bar.progress(10)
-        
         result_segment = backend.process_image(
             input_path=input_path,
             output_base_folder=output_folder,
@@ -98,14 +84,11 @@ else:
             sigma_col=12
         )
         progress_bar.progress(20)
-        st.success(f"Tahap 1 selesai")
+        st.success("✅ Tahap 1 selesai")
 
-        # ------------------------------------------------------------
         # Tahap 2: Filtering
-        # ------------------------------------------------------------
         status_text.text("Tahap 2/5: Filtering objek noise...")
         progress_bar.progress(30)
-        
         df_results, df_saved = backend.process_and_save(
             result_segment,
             output_folder=os.path.join(output_folder, "Filtered"),
@@ -115,21 +98,17 @@ else:
             save_original=False
         )
         progress_bar.progress(40)
-        st.success(f"Tahap 2 selesai")
+        st.success("✅ Tahap 2 selesai")
 
-        # ------------------------------------------------------------
         # Tahap 3: Cropping dan Normalisasi
-        # ------------------------------------------------------------
         status_text.text("Tahap 3/5: Cropping dan Normalisasi...")
         progress_bar.progress(50)
-        
         df_crop = backend.process_image_binary_1x1(
             df_results,
             binary_column="cleaned_binary_image",
             output_folder=os.path.join(output_folder, "Crop")
         )
         progress_bar.progress(55)
-        
         df_rescale = backend.rescale_image_90x90(
             df_crop,
             name_column="Square_image_array",
@@ -137,14 +116,11 @@ else:
             output_path=os.path.join(output_folder, "Rescale")
         )
         progress_bar.progress(60)
-        st.success("Tahap 3 selesai")
+        st.success("✅ Tahap 3 selesai")
 
-        # ------------------------------------------------------------
-        # Tahap 4: Ekstraksi Fitur (8x8, proj_bins=16)
-        # ------------------------------------------------------------
-        status_text.text("Tahap 4/5: Ekstraksi Fitur...")
+        # Tahap 4: Ekstraksi Fitur
+        status_text.text("Tahap 4/5: Ekstraksi Fitur (8x8, proj_bins=16)...")
         progress_bar.progress(70)
-        
         test_features_df = backend.batch_extract_to_dataframe(
             df_rescale["Processed_image_array_90X90"].tolist(),
             labels=None,
@@ -154,28 +130,24 @@ else:
         )
         X_test = test_features_df.values
         progress_bar.progress(80)
-        st.success(f"Tahap 4 selesai")
+        st.success("✅ Tahap 4 selesai")
 
-        # ------------------------------------------------------------
-        # Tahap 5: Prediksi Transliterasi
-        # ------------------------------------------------------------
+        # Tahap 5: Prediksi dan Transliterasi
         status_text.text("Tahap 5/5: Prediksi dan Transliterasi...")
         progress_bar.progress(90)
-        
         result_predict = backend.predict_image(X_test, MODEL_PATH)
         translit_text = backend.combine_latin_transliteration(result_predict)
-        
         progress_bar.progress(100)
         status_text.text("Proses selesai!")
 
-        # simpan hasil
+        # Simpan hasil
         csv_path = os.path.join(output_folder, "hasil_fitur.csv")
         test_features_df.to_csv(csv_path, index=False)
 
-        # tampilkan hasil transliterasi
+        # Tampilkan hasil transliterasi
         st.markdown("<h4 style='color:#850510;'>Hasil Transliterasi:</h4>", unsafe_allow_html=True)
         st.text_area("Teks Latin", translit_text, height=200)
-        
+
         # Statistik
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -186,22 +158,21 @@ else:
             st.metric("Karakter/Baris", f"{len(df_rescale) / df_rescale['row_id'].nunique():.1f}")
         with col4:
             st.metric("Total Kata", len(translit_text.split()))
-        
-        # Download buttons
+
+        # Tombol Download
         st.markdown("<h4 style='color:#850510;'>Download Hasil:</h4>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
-        
         with col1:
             st.download_button(
-                "Download Transliterasi (TXT)", 
-                data=translit_text.encode('utf-8'), 
+                "Download Transliterasi (TXT)",
+                data=translit_text.encode('utf-8'),
                 file_name="hasil_transliterasi.txt",
                 mime="text/plain"
             )
         with col2:
             st.download_button(
-                "Download Fitur (CSV)", 
-                data=test_features_df.to_csv(index=False).encode('utf-8'), 
+                "Download Fitur (CSV)",
+                data=test_features_df.to_csv(index=False).encode('utf-8'),
                 file_name="hasil_fitur.csv",
                 mime="text/csv"
             )
@@ -209,16 +180,14 @@ else:
             detail_df = df_rescale[['row_id', 'col_id', 'start_row', 'end_row', 'start_col', 'end_col']].copy()
             detail_df['prediction'] = result_predict
             st.download_button(
-                "Download Detail (CSV)", 
-                data=detail_df.to_csv(index=False).encode('utf-8'), 
+                "Download Detail (CSV)",
+                data=detail_df.to_csv(index=False).encode('utf-8'),
                 file_name="detail_prediksi.csv",
                 mime="text/csv"
             )
 
-        #st.success(f"Hasil lengkap tersimpan di: {output_folder}")
-        
         # Detail per baris
-        with st.expander("Lihat Detail Prediksi per Baris"):
+        with st.expander("📜 Lihat Detail Prediksi per Baris"):
             for row_id in sorted(df_rescale['row_id'].unique()):
                 row_data = df_rescale[df_rescale['row_id'] == row_id]
                 predictions_in_row = [result_predict[i] for i in row_data.index]
@@ -229,7 +198,9 @@ else:
         import traceback
         st.code(traceback.format_exc())
 
+# ============================================================
 # Footer
+# ============================================================
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
