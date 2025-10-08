@@ -1,13 +1,3 @@
-import subprocess
-import sys
-
-try:
-    import joblib
-except ModuleNotFoundError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "joblib"])
-    import joblib
-
-
 # app.py - Aplikasi Streamlit Transliterasi Aksara Jawa
 import streamlit as st
 import os
@@ -219,4 +209,5 @@ st.markdown("""
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
+
 
