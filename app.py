@@ -8,12 +8,12 @@ import backend  # Import semua fungsi dari backend.py
 from huggingface_hub import hf_hub_download
 
 # ============================================================
-# CSS untuk Tampilan Beige dan Harmonis
+# CSS untuk Tampilan Beige dan Harmonis (Kontras Lebih Baik)
 # ============================================================
 
 # Warna Latar Belakang Utama: #F5F5DC (Beige/Krem)
-# Warna Aksen Utama: #8B4513 (Saddle Brown - Cokelat Gelap)
-# Warna Aksen Sekunder: #A0522D (Sienna - Cokelat Kemerahan Lembut)
+# Warna Teks/Judul Gelap: #654321 (Dark Brown - Kontras Terbaik)
+# Warna Aksen/Tombol: #A0522D (Sienna - Cokelat Kemerahan Lembut)
 
 st.markdown(
     """
@@ -21,12 +21,12 @@ st.markdown(
     /* Mengubah Latar Belakang Utama Aplikasi menjadi Beige */
     .stApp {
         background-color: #F5F5DC; 
-        color: #4B4B4B; /* Warna teks default yang nyaman */
+        color: #654321; /* Warna teks default diubah ke Dark Brown */
     }
-
+    
     /* Mengubah warna teks judul utama dan garis pemisah */
     .stApp h1 {
-        color: #8B4513 !important; /* Cokelat Gelap untuk judul */
+        color: #654321 !important; /* Dark Brown untuk judul */
         text-align: center;
         border-bottom: 2px solid #A0522D; /* Sienna untuk garis bawah */
         padding-bottom: 10px;
@@ -36,66 +36,74 @@ st.markdown(
     /* Mengubah warna teks subjudul/heading */
     .stApp h4, .stApp h3 {
         color: #A0522D !important; /* Sienna untuk subjudul */
-        border-left: 5px solid #8B4513; /* Saddle Brown untuk garis tepi */
+        border-left: 5px solid #654321; /* Dark Brown untuk garis tepi */
         padding-left: 10px;
         margin-top: 20px;
     }
     
-    /* Styling Teks Biasa (mengatasi masalah font tidak terbaca) */
-    .stApp label {
-        color: #4B4B4B; /* Teks label lebih mudah dibaca */
-        font-weight: bold;
+    /* Styling Teks Biasa dan Label - Kontras Tinggi */
+    .stApp label, .stApp p, .stApp span {
+        color: #4B4B4B; /* Cokelat gelap untuk keterbacaan */
     }
-    .stApp p {
-        color: #4B4B4B;
+    
+    /* Tombol Browse File pada st.file_uploader */
+    div[data-testid="stFileUploader"] button {
+        color: white !important;
+        background-color: #A0522D !important;
     }
 
-    /* Styling Info Box - Lebih Lembut */
+    /* Styling Info Box - Lebih Lembut dan Teks Gelap */
     .stApp div[data-testid="stInfo"] {
-        background-color: #FEF9E7; /* Latar belakang Krem Sangat Pucat */
-        border-left: 5px solid #A0522D; /* Garis tepi Sienna */
+        background-color: #FEF9E7; 
+        border-left: 5px solid #A0522D; 
         border-radius: 8px;
         padding: 10px;
-        color: #4B4B4B; 
+        color: #4B4B4B; /* Teks harus gelap */
     }
     
-    /* Styling Warning Box - Lebih Lembut */
+    /* Styling Warning Box - Lebih Lembut dan Teks Gelap */
     .stApp div[data-testid="stWarning"] {
         background-color: #FCF3CF; 
-        border-left: 5px solid #B8860B; /* DarkGoldenrod */
+        border-left: 5px solid #B8860B; 
         border-radius: 8px;
         padding: 10px;
-        color: #4B4B4B;
+        color: #4B4B4B; /* Teks harus gelap */
     }
     
-    /* Styling Success Box - Lebih Lembut */
+    /* Styling Success Box - Hapus warna hijau yang mengganggu, ganti dengan cokelat */
     .stApp div[data-testid="stSuccess"] {
-        background-color: #E9F7EF; /* Latar belakang Hijau Pucat */
-        border-left: 5px solid #3CB371; /* MediumSeaGreen */
+        background-color: #E9F7EF; /* Tetap sedikit hijau pucat, tapi teks gelap */
+        border-left: 5px solid #A0522D; 
         border-radius: 8px;
         padding: 10px;
-        color: #4B4B4B;
+        color: #4B4B4B; /* Teks harus gelap */
     }
 
     /* Styling Text Area dan Input */
     .stApp textarea, .stApp input {
         border: 1px solid #A0522D !important;
         border-radius: 8px;
-        background-color: white; /* Latar belakang putih untuk input/teks area */
+        background-color: white; 
         color: #4B4B4B !important;
+    }
+    
+    /* Styling Text Area Konten (hasil transliterasi) */
+    div[data-testid="stTextarea"] label {
+        color: #A0522D !important; /* Warna label Text Area */
     }
 
     /* Styling Footer */
     .footer-style {
         text-align: center; 
-        color: #8B4513; /* Saddle Brown untuk teks footer */
+        color: #654321; /* Dark Brown */
         padding-top: 10px;
         border-top: 1px solid #A0522D;
+        font-size: 0.9em;
     }
     
-    /* Styling Download Buttons - Aksen Cokelat */
+    /* Styling Download Buttons - Aksen Sienna */
     .stDownloadButton button {
-        background-color: #8B4513; /* Saddle Brown */
+        background-color: #A0522D; /* Sienna */
         color: white;
         border-radius: 5px;
         border: none;
@@ -104,10 +112,10 @@ st.markdown(
         transition: background-color 0.3s;
     }
     .stDownloadButton button:hover {
-        background-color: #A0522D; /* Sienna saat hover */
+        background-color: #8B4513; /* Saddle Brown saat hover */
     }
     
-    /* Styling Metric Boxes */
+    /* Styling Metric Boxes (Statistik) */
     div[data-testid="stMetric"] {
         background-color: #FEF9E7; /* Krem Pucat */
         padding: 15px;
@@ -116,9 +124,22 @@ st.markdown(
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     div[data-testid="stMetric"] label {
-        color: #8B4513; /* Warna label metrik */
+        color: #A0522D; /* Warna label metrik */
     }
-    
+    div[data-testid="stMetricValue"] {
+        color: #654321; /* Warna nilai metrik (harus Dark Brown agar terbaca) */
+    }
+
+    /* Styling Expander */
+    div[data-testid="stExpander"] {
+        border: 1px solid #A0522D;
+        border-radius: 8px;
+    }
+    div[data-testid="stExpander"] div[role="button"] {
+        background-color: #FEF9E7; /* Latar belakang header expander */
+        color: #4B4B4B !important;
+        border-radius: 8px;
+    }
     </style>
     """, unsafe_allow_html=True
 )
@@ -137,6 +158,7 @@ with st.spinner("🔄 Memuat model ..."):
         # Memuat model menggunakan joblib
         model = joblib.load(MODEL_PATH)
         
+        # Teks success dijamin terbaca karena CSS di atas
         st.success("Model berhasil dimuat! 🎉")
         
     except Exception as e:
@@ -150,7 +172,7 @@ with st.spinner("🔄 Memuat model ..."):
 # ============================================================
 st.set_page_config(page_title="JawaLens2.0", layout="wide")
 # Judul utama menggunakan CSS di atas
-st.markdown("<h1>JawaLens 2.0</h1>", unsafe_allow_html=True) 
+st.markdown("<h1>Aplikasi Transliterasi Aksara Jawa</h1>", unsafe_allow_html=True) 
 
 # ============================================================
 # Lokasi folder hasil
@@ -195,6 +217,7 @@ else:
         img_display = img.resize((max(1, w // 3), max(1, h // 3))) 
         st.image(img_display, caption="Gambar Asli", use_container_width=True)
     with col2:
+        # Teks di info box sekarang kontras
         st.info(f"**File:** {uploaded_file.name}\n\n**Ukuran:** {w} x {h} px")
 
     # Progress bar
@@ -218,6 +241,7 @@ else:
             sigma_col=12
         )
         progress_bar.progress(20)
+        # Teks success dijamin terbaca
         st.success(f"✅ Tahap 1 selesai: {len(result_segment)} karakter dari {result_segment['row_id'].nunique()} baris")
 
         # ------------------------------------------------------------
@@ -235,6 +259,7 @@ else:
             save_original=False
         )
         progress_bar.progress(40)
+        # Teks success dijamin terbaca
         st.success(f"✅ Tahap 2 selesai: Dihapus {df_results['removed_objects'].sum()} objek noise")
 
         # ------------------------------------------------------------
@@ -257,6 +282,7 @@ else:
             output_path=os.path.join(output_folder, "Rescale")
         )
         progress_bar.progress(60)
+        # Teks success dijamin terbaca
         st.success("✅ Tahap 3 selesai: Normalisasi ke 90x90 pixels")
 
         # ------------------------------------------------------------
@@ -274,6 +300,7 @@ else:
         )
         X_test = test_features_df.values
         progress_bar.progress(80)
+        # Teks success dijamin terbaca
         st.success(f"✅ Tahap 4 selesai: {X_test.shape[1]} fitur per karakter")
 
         # ------------------------------------------------------------
@@ -294,7 +321,8 @@ else:
         
         st.markdown("---")
         # tampilkan hasil transliterasi
-        st.markdown("<h4 style='color:#A0522D;'>Hasil Transliterasi:</h4>", unsafe_allow_html=True)
+        st.markdown("<h4>Hasil Transliterasi:</h4>", unsafe_allow_html=True)
+        # Teks di text area sekarang kontras
         st.text_area("Teks Latin", translit_text, height=200)
         
         # Statistik
@@ -302,6 +330,7 @@ else:
         st.markdown("<h4>Statistik Hasil:</h4>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
+            # Nilai metrik sekarang kontras
             st.metric("Total Baris", df_rescale['row_id'].nunique())
         with col2:
             st.metric("Total Karakter", len(df_rescale))
@@ -344,6 +373,7 @@ else:
             for row_id in sorted(df_rescale['row_id'].unique()):
                 row_data = df_rescale[df_rescale['row_id'] == row_id]
                 predictions_in_row = [result_predict[i] for i in row_data.index]
+                # Teks di expander sekarang kontras
                 st.markdown(f"**Baris {row_id}:** {' '.join(predictions_in_row)}")
 
     except Exception as e:
