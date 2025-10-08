@@ -240,30 +240,30 @@ else:
         # Membuat ZIP dari seluruh hasil gambar
         # ============================================================
         with col4:
-        zip_buffer = io.BytesIO()
-        
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-            # Loop semua file gambar di subfolder output
-            for root, _, files in os.walk(output_folder):
-                for file in files:
-                    if file.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")):
-                        full_path = os.path.join(root, file)
-                        # Menyimpan dalam struktur folder yang ringkas
-                        arcname = os.path.relpath(full_path, output_folder)
-                        zipf.write(full_path, arcname)
-        # Reset posisi pointer agar bisa dibaca ulang
-        zip_buffer.seek(0)
-        # ============================================================
-        # Tombol download ZIP
-        # ============================================================
-        st.download_button(
-            label="📦 Download Semua Gambar (ZIP)",
-            data=zip_buffer,
-            file_name="hasil_gambar_jawalens.zip",
-            mime="application/zip"
-        )
+            zip_buffer = io.BytesIO()
+            
+            with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+                # Loop semua file gambar di subfolder output
+                for root, _, files in os.walk(output_folder):
+                    for file in files:
+                        if file.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")):
+                            full_path = os.path.join(root, file)
+                            # Menyimpan dalam struktur folder yang ringkas
+                            arcname = os.path.relpath(full_path, output_folder)
+                            zipf.write(full_path, arcname)
+            # Reset posisi pointer agar bisa dibaca ulang
+            zip_buffer.seek(0)
+            # ============================================================
+            # Tombol download ZIP
+            # ============================================================
+            st.download_button(
+                label="📦 Download Semua Gambar (ZIP)",
+                data=zip_buffer,
+                file_name="hasil_gambar_jawalens.zip",
+                mime="application/zip"
+            )
 
-        )
+        
         # Detail per baris
         with st.expander("Lihat Detail Prediksi per Baris"):
             for row_id in sorted(df_rescale['row_id'].unique()):
