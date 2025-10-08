@@ -8,6 +8,98 @@ import backend  # Import semua fungsi dari backend.py
 from huggingface_hub import hf_hub_download
 
 # ============================================================
+# CSS untuk Tampilan Merah Bata yang Lebih Menarik
+# ============================================================
+
+# Warna Merah Bata: #A93226
+# Warna Aksen: #6A4A3A (Cokelat Tua)
+# Warna Latar Belakang Kontainer: #FADBD8 (Merah Muda Sangat Pucat)
+
+st.markdown(
+    """
+    <style>
+    /* Mengubah warna teks judul utama dan garis pemisah */
+    .stApp h1 {
+        color: #A93226 !important;
+        text-align: center;
+        border-bottom: 2px solid #A93226;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    
+    /* Mengubah warna teks subjudul/heading */
+    .stApp h4 {
+        color: #A93226 !important;
+        border-left: 5px solid #A93226;
+        padding-left: 10px;
+        margin-top: 20px;
+    }
+
+    /* Styling Info Box */
+    .stApp div[data-testid="stInfo"] {
+        background-color: #FADBD8; /* Latar belakang lembut */
+        border-left: 5px solid #A93226; /* Garis tepi merah bata */
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    /* Styling Warning Box */
+    .stApp div[data-testid="stWarning"] {
+        background-color: #FCF3CF; /* Latar belakang kuning pucat */
+        border-left: 5px solid #D4AC0D; /* Garis tepi kuning */
+        border-radius: 5px;
+        padding: 10px;
+    }
+    
+    /* Styling Success Box */
+    .stApp div[data-testid="stSuccess"] {
+        background-color: #D5F5E3; /* Latar belakang hijau lembut */
+        border-left: 5px solid #27AE60; /* Garis tepi hijau */
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    /* Styling Text Area */
+    .stApp textarea {
+        border: 1px solid #A93226 !important;
+        border-radius: 5px;
+    }
+
+    /* Styling Footer */
+    .footer-style {
+        text-align: center; 
+        color: #6A4A3A; /* Cokelat tua untuk teks footer */
+        padding-top: 10px;
+        border-top: 1px solid #6A4A3A;
+    }
+    
+    /* Styling Download Buttons */
+    .stDownloadButton button {
+        background-color: #A93226;
+        color: white;
+        border-radius: 8px;
+        border: none;
+        padding: 10px 20px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Styling Metric Boxes */
+    div[data-testid="stMetric"] {
+        background-color: #FADBD8;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #A93226;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    div[data-testid="stMetric"] label {
+        color: #6A4A3A; /* Warna label metrik */
+    }
+    
+    </style>
+    """, unsafe_allow_html=True
+)
+
+# ============================================================
 # Unduh dan muat model dari Hugging Face Hub
 # ============================================================
 REPO_ID = "yuliusat/JawaLens2.0"
@@ -21,7 +113,7 @@ with st.spinner("🔄 Memuat model ..."):
         # Memuat model menggunakan joblib
         model = joblib.load(MODEL_PATH)
         
-        st.success("Model berhasil dimuat !")
+        st.success("Model berhasil dimuat! 🎉")
         
     except Exception as e:
         # Menampilkan pesan error jika pemuatan gagal
@@ -33,8 +125,8 @@ with st.spinner("🔄 Memuat model ..."):
 # Konfigurasi Halaman
 # ============================================================
 st.set_page_config(page_title="JawaLens2.0", layout="wide")
-st.markdown("<h1 style='color:#850510;text-align:center;'>Aplikasi Transliterasi Aksara Jawa</h1>", unsafe_allow_html=True)
-st.markdown("<hr style='border:1px solid #850510;'>", unsafe_allow_html=True)
+# Judul utama menggunakan CSS di atas
+st.markdown("<h1>Aplikasi Transliterasi Aksara Jawa</h1>", unsafe_allow_html=True) 
 
 # ============================================================
 # Lokasi folder hasil
@@ -74,14 +166,18 @@ else:
     with col1:
         img = Image.open(input_path)
         w, h = img.size
-        img_small = img.resize((max(1, w // 4), max(1, h // 4)))
-        st.image(img_small, caption="Gambar Asli", use_container_width=True)
+        # Perubahan untuk menampilkan gambar lebih besar namun tetap proporsional
+        img_display = img.resize((max(1, w // 3), max(1, h // 3))) 
+        st.image(img_display, caption="Gambar Asli", use_container_width=True)
     with col2:
         st.info(f"**File:** {uploaded_file.name}\n\n**Ukuran:** {w} x {h} px")
 
     # Progress bar
     progress_bar = st.progress(0)
     status_text = st.empty()
+    st.markdown("---")
+    
+    st.markdown("<h3>Proses Transliterasi Berjalan:</h3>", unsafe_allow_html=True)
 
     try:
         # ------------------------------------------------------------
@@ -97,7 +193,7 @@ else:
             sigma_col=12
         )
         progress_bar.progress(20)
-        st.success(f"Tahap 1 selesai: {len(result_segment)} karakter dari {result_segment['row_id'].nunique()} baris")
+        st.success(f"✅ Tahap 1 selesai: {len(result_segment)} karakter dari {result_segment['row_id'].nunique()} baris")
 
         # ------------------------------------------------------------
         # Tahap 2: Filtering
@@ -114,7 +210,7 @@ else:
             save_original=False
         )
         progress_bar.progress(40)
-        st.success(f"Tahap 2 selesai: Dihapus {df_results['removed_objects'].sum()} objek noise")
+        st.success(f"✅ Tahap 2 selesai: Dihapus {df_results['removed_objects'].sum()} objek noise")
 
         # ------------------------------------------------------------
         # Tahap 3: Cropping dan Normalisasi
@@ -136,7 +232,7 @@ else:
             output_path=os.path.join(output_folder, "Rescale")
         )
         progress_bar.progress(60)
-        st.success("Tahap 3 selesai: Normalisasi ke 90x90 pixels")
+        st.success("✅ Tahap 3 selesai: Normalisasi ke 90x90 pixels")
 
         # ------------------------------------------------------------
         # Tahap 4: Ekstraksi Fitur (8x8, proj_bins=16)
@@ -153,7 +249,7 @@ else:
         )
         X_test = test_features_df.values
         progress_bar.progress(80)
-        st.success(f"Tahap 4 selesai: {X_test.shape[1]} fitur per karakter")
+        st.success(f"✅ Tahap 4 selesai: {X_test.shape[1]} fitur per karakter")
 
         # ------------------------------------------------------------
         # Tahap 5: Prediksi Transliterasi
@@ -165,17 +261,20 @@ else:
         translit_text = backend.combine_latin_transliteration(result_predict)
         
         progress_bar.progress(100)
-        status_text.text("Proses selesai!")
+        status_text.text("Proses selesai! 🎉")
 
         # simpan hasil
         csv_path = os.path.join(output_folder, "hasil_fitur.csv")
         test_features_df.to_csv(csv_path, index=False)
-
+        
+        st.markdown("---")
         # tampilkan hasil transliterasi
-        st.markdown("<h4 style='color:#850510;'>Hasil Transliterasi:</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color:#A93226;'>Hasil Transliterasi:</h4>", unsafe_allow_html=True)
         st.text_area("Teks Latin", translit_text, height=200)
         
         # Statistik
+        st.markdown("---")
+        st.markdown("<h4 style='color:#A93226;'>Statistik Hasil:</h4>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("Total Baris", df_rescale['row_id'].nunique())
@@ -187,7 +286,8 @@ else:
             st.metric("Total Kata", len(translit_text.split()))
         
         # Download buttons
-        st.markdown("<h4 style='color:#850510;'>Download Hasil:</h4>", unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown("<h4>Download Hasil:</h4>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
         
         with col1:
@@ -220,6 +320,7 @@ else:
         with st.expander("Lihat Detail Prediksi per Baris"):
             for row_id in sorted(df_rescale['row_id'].unique()):
                 row_data = df_rescale[df_rescale['row_id'] == row_id]
+                # Menambahkan karakter spasi/tanda baca berdasarkan prediksi
                 predictions_in_row = [result_predict[i] for i in row_data.index]
                 st.markdown(f"**Baris {row_id}:** {' '.join(predictions_in_row)}")
 
@@ -231,7 +332,7 @@ else:
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: #666;'>
+<div class='footer-style'>
     <p><b>JawaLens 2.0</b></p>
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
