@@ -5,7 +5,7 @@ Tidak ada perubahan pada fungsi-fungsi, hanya copy-paste
 
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import os
 import itertools
 import pandas as pd
