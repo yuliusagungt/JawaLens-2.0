@@ -1,11 +1,12 @@
 """
 Backend module - EXACT COPY dari Result_Segmentation_and_Transliteration.ipynb
 Tidak ada perubahan pada fungsi-fungsi, hanya copy-paste
+FIXED: Removed unused matplotlib import
 """
 
 import cv2
 import numpy as np
-#import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt  # REMOVED - tidak dipakai di kode ini
 import os
 import itertools
 import pandas as pd
@@ -159,7 +160,7 @@ def crop_text_region(nr_binary_image, output_image_path=None, padding_threshold=
     row_min = max(0, row_min - padding_row)
     row_max = min(nr_binary_image.shape[0], row_max + padding_row)
     col_min = max(0, col_min - padding_col)
-    col_max = min(nr_binary_image.shape[1], col_max + padding_col)
+    col_max = min(nr_binary_image.shape[1], col_max + col_col)
 
     cropped_image = nr_binary_image[row_min:row_max, col_min:col_max]
 
@@ -290,7 +291,7 @@ def process_image(input_path=None, output_base_folder=None, name=None, sigma_row
     elif os.path.isdir(input_path):
         image_files = glob.glob(os.path.join(input_path, "*.jpg")) + glob.glob(os.path.join(input_path, "*.png"))
     else:
-        print("⌠Path tidak ditemukan atau bukan file/folder gambar yang valid.")
+        print("Path tidak ditemukan atau bukan file/folder gambar yang valid.")
         return
 
     for idx, image_path in enumerate(image_files, start=1):
@@ -849,9 +850,9 @@ def combine_latin_transliteration(latin_text):
         suku_kata_ganti = re.sub(r'[a]', 'e', suku_kata)
         return f"{suku_kata_ganti}"
 
-    latin_text = re.sub(r'taling\s(\\w+)\s+tarung', taling_tarung, latin_text)
+    latin_text = re.sub(r'taling\s(\w+)\s+tarung', taling_tarung, latin_text)
 
-    latin_text = re.sub(r'taling\s(\\w+)', taling_e, latin_text)
+    latin_text = re.sub(r'taling\s(\w+)', taling_e, latin_text)
 
     latin_text = latin_text.replace("  ", " ").strip()
 
