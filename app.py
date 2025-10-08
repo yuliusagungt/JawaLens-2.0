@@ -13,7 +13,7 @@ from huggingface_hub import hf_hub_download
 REPO_ID = "yuliusat/JawaLens2.0"
 MODEL_FILENAME = "Model.pkl"
 
-with st.spinner("🔄 Memuat model dari Hugging Face Hub..."):
+with st.spinner("🔄 Memuat model ..."):
     try:
         # Mengunduh model dari repository Hugging Face
         MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=MODEL_FILENAME)
@@ -21,7 +21,7 @@ with st.spinner("🔄 Memuat model dari Hugging Face Hub..."):
         # Memuat model menggunakan joblib
         model = joblib.load(MODEL_PATH)
         
-        st.success("✅ Model berhasil dimuat dari Hugging Face Hub!")
+        st.success("Model berhasil dimuat !")
         
     except Exception as e:
         # Menampilkan pesan error jika pemuatan gagal
@@ -32,7 +32,7 @@ with st.spinner("🔄 Memuat model dari Hugging Face Hub..."):
 # ============================================================
 # Konfigurasi Halaman
 # ============================================================
-st.set_page_config(page_title="Transliterasi Aksara Jawa", layout="wide")
+st.set_page_config(page_title="JawaLens2.0", layout="wide")
 st.markdown("<h1 style='color:#850510;text-align:center;'>Aplikasi Transliterasi Aksara Jawa</h1>", unsafe_allow_html=True)
 st.markdown("<hr style='border:1px solid #850510;'>", unsafe_allow_html=True)
 
@@ -40,7 +40,7 @@ st.markdown("<hr style='border:1px solid #850510;'>", unsafe_allow_html=True)
 # Lokasi folder hasil
 # ============================================================
 TEMP_FOLDER = tempfile.mkdtemp()
-GDRIVE_FOLDER = os.path.join(TEMP_FOLDER, "Hasil_Transliterasi_Jawa")
+GDRIVE_FOLDER = os.path.join(TEMP_FOLDER, "JawaLens")
 if not os.path.exists(GDRIVE_FOLDER):
     os.makedirs(GDRIVE_FOLDER, exist_ok=True)
 
@@ -97,7 +97,7 @@ else:
             sigma_col=12
         )
         progress_bar.progress(20)
-        st.success(f"✅ Tahap 1 selesai: {len(result_segment)} karakter dari {result_segment['row_id'].nunique()} baris")
+        st.success(f"Tahap 1 selesai: {len(result_segment)} karakter dari {result_segment['row_id'].nunique()} baris")
 
         # ------------------------------------------------------------
         # Tahap 2: Filtering
@@ -114,7 +114,7 @@ else:
             save_original=False
         )
         progress_bar.progress(40)
-        st.success(f"✅ Tahap 2 selesai: Dihapus {df_results['removed_objects'].sum()} objek noise")
+        st.success(f"Tahap 2 selesai: Dihapus {df_results['removed_objects'].sum()} objek noise")
 
         # ------------------------------------------------------------
         # Tahap 3: Cropping dan Normalisasi
@@ -136,7 +136,7 @@ else:
             output_path=os.path.join(output_folder, "Rescale")
         )
         progress_bar.progress(60)
-        st.success("✅ Tahap 3 selesai: Normalisasi ke 90x90 pixels")
+        st.success("Tahap 3 selesai: Normalisasi ke 90x90 pixels")
 
         # ------------------------------------------------------------
         # Tahap 4: Ekstraksi Fitur (8x8, proj_bins=16)
@@ -153,7 +153,7 @@ else:
         )
         X_test = test_features_df.values
         progress_bar.progress(80)
-        st.success(f"✅ Tahap 4 selesai: {X_test.shape[1]} fitur per karakter")
+        st.success(f"Tahap 4 selesai: {X_test.shape[1]} fitur per karakter")
 
         # ------------------------------------------------------------
         # Tahap 5: Prediksi Transliterasi
@@ -165,7 +165,7 @@ else:
         translit_text = backend.combine_latin_transliteration(result_predict)
         
         progress_bar.progress(100)
-        status_text.text("✅ Proses selesai!")
+        status_text.text("Proses selesai!")
 
         # simpan hasil
         csv_path = os.path.join(output_folder, "hasil_fitur.csv")
@@ -217,7 +217,7 @@ else:
         st.success(f"Hasil lengkap tersimpan di: {output_folder}")
         
         # Detail per baris
-        with st.expander("🔍 Lihat Detail Prediksi per Baris"):
+        with st.expander("Lihat Detail Prediksi per Baris"):
             for row_id in sorted(df_rescale['row_id'].unique()):
                 row_data = df_rescale[df_rescale['row_id'] == row_id]
                 predictions_in_row = [result_predict[i] for i in row_data.index]
