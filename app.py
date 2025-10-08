@@ -207,7 +207,7 @@ else:
         # Download buttons
         st.markdown("---")
         st.markdown("<h4>Download Hasil:</h4>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.download_button(
