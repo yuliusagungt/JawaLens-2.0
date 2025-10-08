@@ -59,6 +59,25 @@ st.markdown(
         border: 1px solid #B8860B !important;
     }
     
+    /* Kotak upload */
+    [data-testid="stFileUploader"] > section {
+        background-color: #5A3E1B !important; /* coklat tua */
+        color: #F5F0D7 !important; /* beige muda */
+    }
+    
+    /* Tombol browse */
+    [data-testid="stFileUploader"] button {
+        background-color: #B8860B !important; /* gold mustard */
+        color: #F5F0D7 !important; /* beige muda */
+    }
+    
+    /* Notifikasi sukses */
+    [data-testid="stNotification"] {
+        background-color: #F5F0D7 !important; /* beige */
+        color: #A33C1A !important; /* merah bata */
+        font-weight: bold;
+    }
+
     /* Area Drag and Drop Uploader */
     div[data-testid="stFileUploadDropzone"] {
         background-color: #8B4513 !important; /* Cokelat Tua untuk kontras dengan tombol */
