@@ -44,26 +44,6 @@ GDRIVE_FOLDER = os.path.join(TEMP_FOLDER, "Hasil_Transliterasi_Jawa")
 if not os.path.exists(GDRIVE_FOLDER):
     os.makedirs(GDRIVE_FOLDER, exist_ok=True)
 
-# ============================================================
-# Unduh dan muat model dari Google Drive
-# ============================================================
-MODEL_URL = "https://drive.google.com/uc?id=18xMwkdeT9NYGY-YS6iYGMT2grUgq48Hw"
-MODEL_PATH = os.path.join(GDRIVE_FOLDER, "model_jawa.pkl")
-
-if not os.path.exists(MODEL_PATH):
-    with st.spinner("Mengunduh model dari Google Drive..."):
-        try:
-            gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
-            st.success("✅ Model berhasil diunduh!")
-        except Exception as e:
-            st.error(f"❌ Error download model: {e}")
-            st.stop()
-
-try:
-    model = joblib.load(MODEL_PATH)
-except Exception as e:
-    st.error(f"❌ Error loading model: {e}")
-    st.stop()
 
 # ============================================================
 # Upload input
