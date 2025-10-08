@@ -6,6 +6,8 @@ import joblib
 from PIL import Image
 import backend  # Import semua fungsi dari backend.py
 from huggingface_hub import hf_hub_download
+import zipfile
+import io
 
 # ============================================================
 # CSS untuk Tampilan Merah Bata yang Lebih Menarik
@@ -232,13 +234,12 @@ else:
             )
 
         #st.success(f"Hasil lengkap tersimpan di: {output_folder}")
-        import zipfile
-        import io
+
         
         # ============================================================
         # Membuat ZIP dari seluruh hasil gambar
         # ============================================================
-        
+        with col4:
         zip_buffer = io.BytesIO()
         
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -250,10 +251,8 @@ else:
                         # Menyimpan dalam struktur folder yang ringkas
                         arcname = os.path.relpath(full_path, output_folder)
                         zipf.write(full_path, arcname)
-        
         # Reset posisi pointer agar bisa dibaca ulang
         zip_buffer.seek(0)
-        
         # ============================================================
         # Tombol download ZIP
         # ============================================================
@@ -264,7 +263,7 @@ else:
             mime="application/zip"
         )
 
-        
+        )
         # Detail per baris
         with st.expander("Lihat Detail Prediksi per Baris"):
             for row_id in sorted(df_rescale['row_id'].unique()):
