@@ -8,12 +8,12 @@ import backend  # Import semua fungsi dari backend.py
 from huggingface_hub import hf_hub_download
 
 # ============================================================
-# CSS untuk Tampilan Beige dan Harmonis (Kontras Lebih Baik)
+# CSS untuk Tampilan Beige, Teks Merah Bata, Tombol Cokelat Muda
 # ============================================================
 
 # Warna Latar Belakang Utama: #F5F5DC (Beige/Krem)
-# Warna Teks/Judul Gelap: #654321 (Dark Brown - Kontras Terbaik)
-# Warna Aksen/Tombol: #A0522D (Sienna - Cokelat Kemerahan Lembut)
+# Warna Teks/Aksen: #A93226 (Merah Bata)
+# Warna Tombol/Uploader: #B8860B (Dark Goldenrod - Cokelat Muda)
 
 st.markdown(
     """
@@ -21,89 +21,100 @@ st.markdown(
     /* Mengubah Latar Belakang Utama Aplikasi menjadi Beige */
     .stApp {
         background-color: #F5F5DC; 
-        color: #654321; /* Warna teks default diubah ke Dark Brown */
+        color: #A93226; /* Warna teks default diubah ke Merah Bata */
     }
     
     /* Mengubah warna teks judul utama dan garis pemisah */
     .stApp h1 {
-        color: #654321 !important; /* Dark Brown untuk judul */
+        color: #A93226 !important; /* Merah Bata untuk judul */
         text-align: center;
-        border-bottom: 2px solid #A0522D; /* Sienna untuk garis bawah */
+        border-bottom: 2px solid #A93226; 
         padding-bottom: 10px;
         margin-bottom: 20px;
     }
     
     /* Mengubah warna teks subjudul/heading */
     .stApp h4, .stApp h3 {
-        color: #A0522D !important; /* Sienna untuk subjudul */
-        border-left: 5px solid #654321; /* Dark Brown untuk garis tepi */
+        color: #A93226 !important; /* Merah Bata untuk subjudul */
+        border-left: 5px solid #A93226; /* Merah Bata untuk garis tepi */
         padding-left: 10px;
         margin-top: 20px;
     }
     
-    /* Styling Teks Biasa dan Label - Kontras Tinggi */
-    .stApp label, .stApp p, .stApp span {
-        color: #4B4B4B; /* Cokelat gelap untuk keterbacaan */
+    /* Styling Teks Biasa, Label, dan Konten - Seluruhnya Merah Bata */
+    .stApp label, .stApp p, .stApp span, .stApp div[data-testid="stInfo"] > *, 
+    .stApp div[data-testid="stWarning"] > *, .stApp div[data-testid="stSuccess"] > * {
+        color: #A93226 !important; /* Semua teks diubah ke Merah Bata */
     }
     
+    /* Warna teks pada Progress Bar */
+    div[data-testid="stProgress"] > div > div > div > div > div {
+        color: #A93226 !important; 
+    }
+
     /* Tombol Browse File pada st.file_uploader */
     div[data-testid="stFileUploader"] button {
         color: white !important;
-        background-color: #A0522D !important;
+        background-color: #B8860B !important; /* Cokelat Muda */
+        border: 1px solid #B8860B !important;
+    }
+    
+    /* Area Drag and Drop Uploader */
+    div[data-testid="stFileUploadDropzone"] {
+        background-color: #8B4513 !important; /* Cokelat Tua untuk kontras dengan tombol */
+        border: 2px dashed #A93226;
+        color: white !important;
+    }
+    
+    /* Warna Teks di dalam Uploader Area */
+    div[data-testid="stFileUploadDropzone"] * {
+        color: white !important;
     }
 
-    /* Styling Info Box - Lebih Lembut dan Teks Gelap */
+    /* Styling Info Box */
     .stApp div[data-testid="stInfo"] {
-        background-color: #FEF9E7; 
-        border-left: 5px solid #A0522D; 
+        background-color: #FEEEEE; /* Latar belakang sangat pucat */
+        border-left: 5px solid #A93226; 
         border-radius: 8px;
         padding: 10px;
-        color: #4B4B4B; /* Teks harus gelap */
     }
     
-    /* Styling Warning Box - Lebih Lembut dan Teks Gelap */
+    /* Styling Warning Box */
     .stApp div[data-testid="stWarning"] {
-        background-color: #FCF3CF; 
-        border-left: 5px solid #B8860B; 
+        background-color: #FFF8E1; 
+        border-left: 5px solid #A93226; 
         border-radius: 8px;
         padding: 10px;
-        color: #4B4B4B; /* Teks harus gelap */
     }
     
-    /* Styling Success Box - Hapus warna hijau yang mengganggu, ganti dengan cokelat */
+    /* Styling Success Box */
     .stApp div[data-testid="stSuccess"] {
-        background-color: #E9F7EF; /* Tetap sedikit hijau pucat, tapi teks gelap */
-        border-left: 5px solid #A0522D; 
+        background-color: #E6F0E0; /* Hijau pucat tapi teks merah bata */
+        border-left: 5px solid #A93226; 
         border-radius: 8px;
         padding: 10px;
-        color: #4B4B4B; /* Teks harus gelap */
     }
 
     /* Styling Text Area dan Input */
     .stApp textarea, .stApp input {
-        border: 1px solid #A0522D !important;
+        border: 1px solid #A93226 !important;
         border-radius: 8px;
         background-color: white; 
-        color: #4B4B4B !important;
+        color: #A93226 !important; /* Teks input Merah Bata */
     }
     
-    /* Styling Text Area Konten (hasil transliterasi) */
-    div[data-testid="stTextarea"] label {
-        color: #A0522D !important; /* Warna label Text Area */
-    }
-
     /* Styling Footer */
     .footer-style {
         text-align: center; 
-        color: #654321; /* Dark Brown */
+        color: #A93226; /* Merah Bata */
         padding-top: 10px;
-        border-top: 1px solid #A0522D;
+        border-top: 1px solid #A93226;
         font-size: 0.9em;
     }
     
-    /* Styling Download Buttons - Aksen Sienna */
+    /* Styling Download Buttons - Cokelat Muda */
     .stDownloadButton button {
-        background-color: #A0522D; /* Sienna */
+        background-color: #B8860B; /* Cokelat Muda */
         color: white;
         border-radius: 5px;
         border: none;
@@ -112,7 +123,7 @@ st.markdown(
         transition: background-color 0.3s;
     }
     .stDownloadButton button:hover {
-        background-color: #8B4513; /* Saddle Brown saat hover */
+        background-color: #A0522D; /* Sienna saat hover */
     }
     
     /* Styling Metric Boxes (Statistik) */
@@ -120,24 +131,24 @@ st.markdown(
         background-color: #FEF9E7; /* Krem Pucat */
         padding: 15px;
         border-radius: 8px;
-        border: 1px solid #A0522D;
+        border: 1px solid #A93226;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     div[data-testid="stMetric"] label {
-        color: #A0522D; /* Warna label metrik */
+        color: #A93226 !important; /* Label metrik Merah Bata */
     }
     div[data-testid="stMetricValue"] {
-        color: #654321; /* Warna nilai metrik (harus Dark Brown agar terbaca) */
+        color: #A93226 !important; /* Nilai metrik Merah Bata */
     }
 
     /* Styling Expander */
     div[data-testid="stExpander"] {
-        border: 1px solid #A0522D;
+        border: 1px solid #A93226;
         border-radius: 8px;
     }
     div[data-testid="stExpander"] div[role="button"] {
-        background-color: #FEF9E7; /* Latar belakang header expander */
-        color: #4B4B4B !important;
+        background-color: #FEEEEE; /* Latar belakang header expander */
+        color: #A93226 !important;
         border-radius: 8px;
     }
     </style>
@@ -158,7 +169,6 @@ with st.spinner("🔄 Memuat model ..."):
         # Memuat model menggunakan joblib
         model = joblib.load(MODEL_PATH)
         
-        # Teks success dijamin terbaca karena CSS di atas
         st.success("Model berhasil dimuat! 🎉")
         
     except Exception as e:
@@ -217,7 +227,6 @@ else:
         img_display = img.resize((max(1, w // 3), max(1, h // 3))) 
         st.image(img_display, caption="Gambar Asli", use_container_width=True)
     with col2:
-        # Teks di info box sekarang kontras
         st.info(f"**File:** {uploaded_file.name}\n\n**Ukuran:** {w} x {h} px")
 
     # Progress bar
@@ -241,7 +250,6 @@ else:
             sigma_col=12
         )
         progress_bar.progress(20)
-        # Teks success dijamin terbaca
         st.success(f"✅ Tahap 1 selesai: {len(result_segment)} karakter dari {result_segment['row_id'].nunique()} baris")
 
         # ------------------------------------------------------------
@@ -259,7 +267,6 @@ else:
             save_original=False
         )
         progress_bar.progress(40)
-        # Teks success dijamin terbaca
         st.success(f"✅ Tahap 2 selesai: Dihapus {df_results['removed_objects'].sum()} objek noise")
 
         # ------------------------------------------------------------
@@ -282,7 +289,6 @@ else:
             output_path=os.path.join(output_folder, "Rescale")
         )
         progress_bar.progress(60)
-        # Teks success dijamin terbaca
         st.success("✅ Tahap 3 selesai: Normalisasi ke 90x90 pixels")
 
         # ------------------------------------------------------------
@@ -300,7 +306,6 @@ else:
         )
         X_test = test_features_df.values
         progress_bar.progress(80)
-        # Teks success dijamin terbaca
         st.success(f"✅ Tahap 4 selesai: {X_test.shape[1]} fitur per karakter")
 
         # ------------------------------------------------------------
@@ -322,7 +327,6 @@ else:
         st.markdown("---")
         # tampilkan hasil transliterasi
         st.markdown("<h4>Hasil Transliterasi:</h4>", unsafe_allow_html=True)
-        # Teks di text area sekarang kontras
         st.text_area("Teks Latin", translit_text, height=200)
         
         # Statistik
@@ -330,7 +334,6 @@ else:
         st.markdown("<h4>Statistik Hasil:</h4>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            # Nilai metrik sekarang kontras
             st.metric("Total Baris", df_rescale['row_id'].nunique())
         with col2:
             st.metric("Total Karakter", len(df_rescale))
@@ -373,13 +376,12 @@ else:
             for row_id in sorted(df_rescale['row_id'].unique()):
                 row_data = df_rescale[df_rescale['row_id'] == row_id]
                 predictions_in_row = [result_predict[i] for i in row_data.index]
-                # Teks di expander sekarang kontras
                 st.markdown(f"**Baris {row_id}:** {' '.join(predictions_in_row)}")
 
     except Exception as e:
         st.error(f"Terjadi kesalahan: {e}")
         import traceback
-        st.code(traceback.format_exc())
+        st.code(tracebox.format_exc())
 
 # Footer
 st.markdown("---")
