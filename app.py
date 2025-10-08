@@ -1,5 +1,3 @@
-!pip install joblib
-
 import streamlit as st
 import joblib
 import numpy as np
@@ -212,6 +210,7 @@ st.markdown("""
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
