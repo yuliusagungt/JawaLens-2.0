@@ -6,8 +6,7 @@ import os
 from PIL import Image
 import tempfile
 from huggingface_hub import hf_hub_download
-import backend  # pastikan backend.py ada di repo
-
+import backend
 
 # ============================================================
 # Konfigurasi Halaman
@@ -31,11 +30,19 @@ MODEL_FILENAME = "Model.pkl"
 
 with st.spinner("🔄 Memuat model dari Hugging Face Hub..."):
     try:
+        # Mengunduh model dari repository Hugging Face
         MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=MODEL_FILENAME)
+        
+        # Memuat model menggunakan joblib
         model = joblib.load(MODEL_PATH)
+        
         st.success("✅ Model berhasil dimuat dari Hugging Face Hub!")
+        
     except Exception as e:
+        # Menampilkan pesan error jika pemuatan gagal
         st.error(f"Gagal memuat model: {e}")
+        
+        # Menghentikan eksekusi aplikasi Streamlit
         st.stop()
 
 # ============================================================
@@ -210,6 +217,7 @@ st.markdown("""
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
