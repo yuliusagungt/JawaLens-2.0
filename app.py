@@ -13,7 +13,7 @@ from huggingface_hub import hf_hub_download
 REPO_ID = "yuliusat/JawaLens2.0"
 MODEL_FILENAME = "Model.pkl"
 
-with st.spinner("🔄 Memuat model ..."):
+with st.spinner("Memuat model ..."):
     try:
         # Mengunduh model dari repository Hugging Face
         MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=MODEL_FILENAME)
@@ -236,6 +236,3 @@ st.markdown("""
     <p>Menggunakan KNN dengan ekstraksi fitur Zoning (8x8), Projection Profile (16 bins), dan Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
-
-
-buat tampilan lebih nice dengan warna khas merah bata, tanpa mengubah apapun isi dan fungsinya
