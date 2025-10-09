@@ -363,7 +363,7 @@ if st.session_state.uploaded_image is not None:
         *Cara memotong gambar :*
         - Klik dan seret pada gambar untuk memilih area yang ingin dipotong 
         - Sesuaikan area pilihan dengan menyeret sudut atau tepinya
-        - Klik "Konfirmasi Potongan" ketika kamu sudah puas dengan hasilnya
+        - Klik "Konfirmasi Cropping" ketika kamu sudah puas dengan hasilnya
         """)
         
         # Cropper widget
