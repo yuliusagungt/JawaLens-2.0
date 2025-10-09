@@ -1,3 +1,19 @@
+"""
+Brick Red Image Cropper - Modern Minimal Streamlit App
+======================================================
+
+REQUIRED PACKAGES:
+pip install streamlit streamlit-cropper pillow numpy opencv-python-headless joblib huggingface_hub scikit-image scipy scikit-learn
+
+HOW TO RUN:
+streamlit run app.py
+
+DESCRIPTION:
+A beautiful, minimal image processing app with interactive cropping.
+Features a brick-red (#B7410E) and soft beige (#F5F0E1) color scheme.
+Includes JawaLens 2.0 model for Javanese script transliteration.
+"""
+
 import streamlit as st
 from PIL import Image
 import numpy as np
@@ -8,8 +24,9 @@ import tempfile
 import os
 import zipfile
 from huggingface_hub import hf_hub_download
-import backend 
+import backend  # Import all functions from backend.py
 
+# Try to import streamlit-cropper, provide fallback instructions
 try:
     from streamlit_cropper import st_cropper
     CROPPER_AVAILABLE = True
@@ -30,36 +47,38 @@ except ImportError:
 # MODEL LOADING FROM HUGGING FACE
 # ============================================================
 REPO_ID = "yuliusat/JawaLens2.0"
-MODEL_FILENAME = "Model.pkl"
+
+# Model options
+MODEL_OPTIONS = {
+    "Model 1: 281 Kelas, 500 data per kelas, n3": "Model1.pkl",
+    "Model 2: 281 Kelas, 500 data per kelas, n11": "Model2.pkl"
+}
 
 @st.cache_resource
-def load_model():
-    """Memuat Model"""
-    with st.spinner("Proses Pemuatan Model..."):
+def load_model(model_filename):
+    """Load model from Hugging Face Hub with caching"""
+    with st.spinner(f"Loading model {model_filename}..."):
         try:
             # Download model from Hugging Face repository
-            MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=MODEL_FILENAME)
+            MODEL_PATH = hf_hub_download(repo_id=REPO_ID, filename=model_filename)
             
             # Load model using joblib
             model = joblib.load(MODEL_PATH)
             
-            st.success("Model berhasil dimuat")
+            st.success(f"Model {model_filename} loaded successfully!")
             return model, MODEL_PATH
             
         except Exception as e:
             # Display error message if loading fails
-            st.error(f"Model gagal dimuat : {e}")
+            st.error(f"Failed to load model: {e}")
             st.stop()
             return None, None
-
-# Load model at startup
-model, MODEL_PATH = load_model()
 
 # ============================================================
 # PAGE CONFIGURATION
 # ============================================================
 st.set_page_config(
-    page_title="JawaLens 2.0",
+    page_title="Brick Red Image Processor",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -163,6 +182,10 @@ st.markdown("""
 # ============================================================
 
 def process_image(image_pil, processing_type="grayscale"):
+    """
+    Apply simple image processing.
+    Options: grayscale, edge_detection, blur, sharpen
+    """
     img_array = np.array(image_pil)
     
     # Convert RGB to BGR for OpenCV
@@ -197,13 +220,20 @@ def process_image(image_pil, processing_type="grayscale"):
 
 
 def process_javanese_script(image_pil, model_path, output_folder):
+    """
+    Process Javanese script image using JawaLens backend.
+    Returns transliteration results and processed dataframes.
+    """
+    # Save image temporarily
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
         image_pil.save(temp, format="PNG")
         input_path = temp.name
     
     try:
+        # Prepare output folder
         os.makedirs(output_folder, exist_ok=True)
         
+        # Stage 1: Segmentation and Preprocessing
         result_segment = backend.process_image(
             input_path=input_path,
             output_base_folder=output_folder,
@@ -211,6 +241,7 @@ def process_javanese_script(image_pil, model_path, output_folder):
             sigma_col=12
         )
         
+        # Stage 2: Filtering
         df_results, df_saved = backend.process_and_save(
             result_segment,
             output_folder=os.path.join(output_folder, "Filtered"),
@@ -220,6 +251,7 @@ def process_javanese_script(image_pil, model_path, output_folder):
             save_original=False
         )
         
+        # Stage 3: Cropping and Normalization
         df_crop = backend.process_image_binary_1x1(
             df_results,
             binary_column="cleaned_binary_image",
@@ -233,6 +265,7 @@ def process_javanese_script(image_pil, model_path, output_folder):
             output_path=os.path.join(output_folder, "Rescale")
         )
         
+        # Stage 4: Feature Extraction
         test_features_df = backend.batch_extract_to_dataframe(
             df_rescale["Processed_image_array_90X90"].tolist(),
             labels=None,
@@ -242,9 +275,11 @@ def process_javanese_script(image_pil, model_path, output_folder):
         )
         X_test = test_features_df.values
         
+        # Stage 5: Prediction and Transliteration
         result_predict = backend.predict_image(X_test, model_path)
         translit_text = backend.combine_latin_transliteration(result_predict)
         
+        # Save results
         csv_path = os.path.join(output_folder, "hasil_fitur.csv")
         test_features_df.to_csv(csv_path, index=False)
         
@@ -257,11 +292,13 @@ def process_javanese_script(image_pil, model_path, output_folder):
         }
         
     finally:
+        # Clean up temp file
         if os.path.exists(input_path):
             os.remove(input_path)
 
 
 def pil_to_bytes(image_pil, format="PNG"):
+    """Convert PIL Image to bytes for download."""
     buf = io.BytesIO()
     image_pil.save(buf, format=format)
     buf.seek(0)
@@ -284,24 +321,61 @@ if 'javanese_results' not in st.session_state:
     st.session_state.javanese_results = None
 if 'processing_mode' not in st.session_state:
     st.session_state.processing_mode = "simple"  # simple or javanese
+if 'selected_model' not in st.session_state:
+    st.session_state.selected_model = "Model 1: 281 Kelas, 500 data per kelas, n3"
+if 'model_path' not in st.session_state:
+    st.session_state.model_path = None
 
 # ============================================================
 # MAIN APP
 # ============================================================
 
 # Header
-st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>JawaLens 2.0</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>Brick Red Image Processor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #8D6E63; margin-bottom: 2rem;'>Upload, crop, and process your images with style</p>", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ============================================================
+# MODEL SELECTION
+# ============================================================
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("### Select Model")
+
+selected_model = st.selectbox(
+    "Choose the model to use:",
+    options=list(MODEL_OPTIONS.keys()),
+    index=list(MODEL_OPTIONS.keys()).index(st.session_state.selected_model),
+    help="Select which trained model to use for transliteration"
+)
+
+# Load model if selection changed
+if selected_model != st.session_state.selected_model:
+    st.session_state.selected_model = selected_model
+    model_filename = MODEL_OPTIONS[selected_model]
+    model, MODEL_PATH = load_model(model_filename)
+    st.session_state.model_path = MODEL_PATH
+else:
+    # Load model for first time or if not loaded yet
+    if st.session_state.model_path is None:
+        model_filename = MODEL_OPTIONS[selected_model]
+        model, MODEL_PATH = load_model(model_filename)
+        st.session_state.model_path = MODEL_PATH
+    else:
+        MODEL_PATH = st.session_state.model_path
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================================
 # STEP 1: UPLOAD IMAGE
 # ============================================================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("### Step 1: Upload Naskah")
+st.markdown("### Step 1: Upload Your Image")
 
 uploaded_file = st.file_uploader(
-    "Pilih File (PNG, JPG, JPEG)",
+    "Choose an image file (PNG, JPG, JPEG)",
     type=["png", "jpg", "jpeg"],
-    help="Pilih Naskah dari device Anda"
+    help="Select an image from your device"
 )
 
 if uploaded_file is not None:
@@ -317,7 +391,7 @@ if uploaded_file is not None:
     with col3:
         st.metric("Mode", st.session_state.uploaded_image.mode)
     
-    st.success("Naskah berhasil diupload")
+    st.success("Image uploaded successfully!")
 else:
     st.info("Please upload an image to get started")
     st.session_state.uploaded_image = None
@@ -332,19 +406,19 @@ st.markdown("</div>", unsafe_allow_html=True)
 # ============================================================
 if st.session_state.uploaded_image is not None:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("### Step 2: Cropping")
+    st.markdown("### Step 2: Crop or Process")
     
     # Choice: Crop or Process as-is
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("Crop Naskah", use_container_width=True):
+        if st.button("Crop Image", use_container_width=True):
             st.session_state.show_cropper = True
             st.session_state.final_image = None
             st.rerun()
     
     with col2:
-        if st.button("Langsung Proses Naskah", use_container_width=True):
+        if st.button("Process As-Is", use_container_width=True):
             st.session_state.show_cropper = False
             st.session_state.final_image = st.session_state.uploaded_image
             st.session_state.cropped_image = None
@@ -357,13 +431,13 @@ if st.session_state.uploaded_image is not None:
     # ============================================================
     if st.session_state.show_cropper:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### Cropping Interaktif ")
+        st.markdown("### Interactive Cropping")
         
         st.info("""
-        *Cara memotong gambar :*
-        - Klik dan seret pada gambar untuk memilih area yang ingin dipotong 
-        - Sesuaikan area pilihan dengan menyeret sudut atau tepinya
-        - Klik "Konfirmasi Cropping" ketika kamu sudah puas dengan hasilnya
+        **How to crop:**
+        - Click and drag on the image to select an area
+        - Adjust the selection by dragging the corners or edges
+        - Click 'Confirm Crop' when you're happy with the selection
         """)
         
         # Cropper widget
@@ -377,7 +451,7 @@ if st.session_state.uploaded_image is not None:
         
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
-            if st.button("Konfimasi Cropping", use_container_width=True, type="primary"):
+            if st.button("Confirm Crop", use_container_width=True, type="primary"):
                 st.session_state.cropped_image = cropped_img
                 st.session_state.final_image = cropped_img
                 st.session_state.show_cropper = False
@@ -391,9 +465,10 @@ if st.session_state.uploaded_image is not None:
 # ============================================================
 if st.session_state.final_image is not None:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("### Step 3: Transliterasi Aksara Jawa")
+    st.markdown("### Step 3: Javanese Script Transliteration")
     
-    st.info("Processing Javanese script ...")
+    # Display selected model info
+    st.info(f"Using: **{st.session_state.selected_model}**")
     
     # Create temp folder for results
     temp_folder = tempfile.mkdtemp()
@@ -404,24 +479,24 @@ if st.session_state.final_image is not None:
     status_text = st.empty()
     
     try:
-        status_text.text("Stage 1/5: Preprocessing and Segmentasi...")
+        status_text.text("Stage 1/5: Preprocessing and Segmentation...")
         progress_bar.progress(20)
         
         status_text.text("Stage 2/5: Filtering noise...")
         progress_bar.progress(40)
         
-        status_text.text("Stage 3/5: Cropping and Normalisasi...")
+        status_text.text("Stage 3/5: Cropping and Normalization...")
         progress_bar.progress(60)
         
-        status_text.text("Stage 4/5: Ekstraksi Fitur...")
+        status_text.text("Stage 4/5: Feature Extraction...")
         progress_bar.progress(80)
         
-        status_text.text("Stage 5/5: Transliterasi...")
+        status_text.text("Stage 5/5: Transliteration...")
         
-        # Process with JawaLens
+        # Process with JawaLens using selected model
         results = process_javanese_script(
             st.session_state.final_image,
-            MODEL_PATH,
+            st.session_state.model_path,
             output_folder
         )
         st.session_state.javanese_results = results
@@ -433,27 +508,27 @@ if st.session_state.final_image is not None:
         
         # Display Results
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### Hasil Cropping")
+        st.markdown("### Transliteration Results")
         
         # Display original image
-        st.image(st.session_state.final_image, caption="Naskah yang Ditransliterasi", use_container_width=True)
+        st.image(st.session_state.final_image, caption="Original Javanese Script", use_container_width=True)
         
         # Display transliteration
-        st.markdown("#### Transliterasi Latin : ")
+        st.markdown("#### Latin Transliteration:")
         st.text_area("Result", results['transliteration'], height=200)
         
         # Statistics
-        st.markdown("#### Statistik : ")
+        st.markdown("#### Statistics:")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total Baris", results['df_rescale']['row_id'].nunique())
+            st.metric("Total Rows", results['df_rescale']['row_id'].nunique())
         with col2:
-            st.metric("Total Karakter", len(results['df_rescale']))
+            st.metric("Total Characters", len(results['df_rescale']))
         with col3:
             avg_chars = len(results['df_rescale']) / results['df_rescale']['row_id'].nunique()
-            st.metric("Karakter per Baris", f"{avg_chars:.1f}")
+            st.metric("Chars/Row", f"{avg_chars:.1f}")
         with col4:
-            st.metric("Total Aksara", len(results['transliteration'].split()))
+            st.metric("Total Words", len(results['transliteration'].split()))
         
         st.markdown("</div>", unsafe_allow_html=True)
         
@@ -514,7 +589,7 @@ if st.session_state.final_image is not None:
             # Tombol download ZIP
             # ============================================================
             st.download_button(
-                label="Download Gambar Hasil Pemrosesan (ZIP)",
+                label="Download Semua Gambar (ZIP)",
                 data=zip_buffer,
                 file_name="hasil_gambar_jawalens.zip",
                 mime="application/zip",
@@ -524,7 +599,7 @@ if st.session_state.final_image is not None:
         st.markdown("</div>", unsafe_allow_html=True)
         
         # Detail per row
-        with st.expander("Lihat Detail Per baris"):
+        with st.expander("View Detailed Predictions per Row"):
             for row_id in sorted(results['df_rescale']['row_id'].unique()):
                 row_data = results['df_rescale'][results['df_rescale']['row_id'] == row_id]
                 predictions_in_row = [results['result_predict'][i] for i in row_data.index]
@@ -538,9 +613,11 @@ if st.session_state.final_image is not None:
 # ============================================================
 # FOOTER
 # ============================================================
+st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #8D6E63; padding: 2rem 0;'>
-    <p><strong>JawaLens 2.0</strong> | Built with Streamlit</p>
-    <p style='font-size: 0.8rem;'>Transliterasi Aksara Jawa dengan KNN menggunakan Zoning, Projection Profile, dan Hu Moments</p>
+    <p><strong>Brick Red Image Processor + JawaLens 2.0</strong> | Built with Streamlit</p>
+    <p style='font-size: 0.9rem;'>Modern - Minimal - Beautiful</p>
+    <p style='font-size: 0.8rem;'>Javanese Script Transliteration powered by KNN with Zoning, Projection Profile & Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
