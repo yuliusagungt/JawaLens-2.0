@@ -262,7 +262,6 @@ def process_javanese_script(image_pil, model_path, output_folder):
 
 
 def pil_to_bytes(image_pil, format="PNG"):
-    """Convert PIL Image to bytes for download."""
     buf = io.BytesIO()
     image_pil.save(buf, format=format)
     buf.seek(0)
@@ -293,8 +292,6 @@ if 'processing_mode' not in st.session_state:
 # Header
 st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>JawaLens 2.0</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #8D6E63; margin-bottom: 2rem;'>Transliterasikan naskah anda</p>", unsafe_allow_html=True)
-
-st.markdown("---")
 
 # ============================================================
 # STEP 1: UPLOAD IMAGE
@@ -361,7 +358,7 @@ if st.session_state.uploaded_image is not None:
     # ============================================================
     if st.session_state.show_cropper:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### Interactive Cropping")
+        st.markdown("### Interaktif Cropping")
         
         st.info("""
         *Cara memotong gambar :*
@@ -388,7 +385,7 @@ if st.session_state.uploaded_image is not None:
                 st.success("Image cropped successfully!")
                 st.rerun()
         
-        st.markdown("</div>", unsafe_allow_html=True)
+        #st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================================
 # STEP 3: JAVANESE SCRIPT PROCESSING
