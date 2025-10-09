@@ -291,7 +291,6 @@ if 'processing_mode' not in st.session_state:
 
 # Header
 st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>JawaLens 2.0</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8D6E63; margin-bottom: 2rem;'>Transliterasikan naskah anda</p>", unsafe_allow_html=True)
 
 # ============================================================
 # STEP 1: UPLOAD IMAGE
