@@ -78,7 +78,7 @@ def load_model(model_filename):
 # PAGE CONFIGURATION
 # ============================================================
 st.set_page_config(
-    page_title="Brick Red Image Processor",
+    page_title="JawaLens2.0",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -331,7 +331,7 @@ if 'model_path' not in st.session_state:
 # ============================================================
 
 # Header
-st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>Brick Red Image Processor</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>JawaLens2.0</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #8D6E63; margin-bottom: 2rem;'>Upload, crop, and process your images with style</p>", unsafe_allow_html=True)
 
 st.markdown("---")
@@ -616,8 +616,7 @@ if st.session_state.final_image is not None:
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #8D6E63; padding: 2rem 0;'>
-    <p><strong>Brick Red Image Processor + JawaLens 2.0</strong> | Built with Streamlit</p>
-    <p style='font-size: 0.9rem;'>Modern - Minimal - Beautiful</p>
+    <p><strong>JawaLens 2.0</strong> | Built with Streamlit</p>
     <p style='font-size: 0.8rem;'>Javanese Script Transliteration powered by KNN with Zoning, Projection Profile & Hu Moments</p>
 </div>
 """, unsafe_allow_html=True)
