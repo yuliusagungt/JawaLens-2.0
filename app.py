@@ -385,7 +385,7 @@ if st.session_state.uploaded_image is not None:
                 st.success("Image cropped successfully!")
                 st.rerun()
         
-        #st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================================
 # STEP 3: JAVANESE SCRIPT PROCESSING
@@ -434,10 +434,10 @@ if st.session_state.final_image is not None:
         
         # Display Results
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### Hasil Transliterasi")
+        st.markdown("### Hasil Cropping")
         
         # Display original image
-        st.image(st.session_state.final_image, caption="Naskah Asli", use_container_width=True)
+        st.image(st.session_state.final_image, caption="Naskah yang Ditransliterasi", use_container_width=True)
         
         # Display transliteration
         st.markdown("#### Transliterasi Latin : ")
@@ -539,7 +539,6 @@ if st.session_state.final_image is not None:
 # ============================================================
 # FOOTER
 # ============================================================
-st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #8D6E63; padding: 2rem 0;'>
     <p><strong>JawaLens 2.0</strong> | Built with Streamlit</p>
