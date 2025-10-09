@@ -357,7 +357,7 @@ if st.session_state.uploaded_image is not None:
     # ============================================================
     if st.session_state.show_cropper:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### Interaktif Cropping")
+        st.markdown("###Cropping Interaktif ")
         
         st.info("""
         *Cara memotong gambar :*
