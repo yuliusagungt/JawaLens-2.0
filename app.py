@@ -1,5 +1,5 @@
 """
-Brick Red Image Cropper - Modern Minimal Streamlit App
+JawaLens 2.0
 ======================================================
 
 REQUIRED PACKAGES:
@@ -367,37 +367,100 @@ else:
 st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================================
-# STEP 1: UPLOAD IMAGE
+# STEP 1: UPLOAD OR CAPTURE IMAGE
 # ============================================================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("### Step 1: Upload Your Image")
+st.markdown("### Step 1: Upload or Capture Your Image")
 
-uploaded_file = st.file_uploader(
-    "Choose an image file (PNG, JPG, JPEG)",
-    type=["png", "jpg", "jpeg"],
-    help="Select an image from your device"
-)
+# Tab untuk memilih metode input
+tab1, tab2 = st.tabs(["📁 Upload File", "📷 Capture Photo"])
 
-if uploaded_file is not None:
-    # Load and store image
-    st.session_state.uploaded_image = Image.open(uploaded_file)
+with tab1:
+    uploaded_file = st.file_uploader(
+        "Choose an image file (PNG, JPG, JPEG)",
+        type=["png", "jpg", "jpeg"],
+        help="Select an image from your device"
+    )
+
+    if uploaded_file is not None:
+        # Load and store image
+        st.session_state.uploaded_image = Image.open(uploaded_file)
+        
+        # Display uploaded image info
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Format", st.session_state.uploaded_image.format)
+        with col2:
+            st.metric("Size", f"{st.session_state.uploaded_image.size[0]} x {st.session_state.uploaded_image.size[1]}")
+        with col3:
+            st.metric("Mode", st.session_state.uploaded_image.mode)
+        
+        st.success("Image uploaded successfully!")
+
+with tab2:
+    st.markdown("""
+    <style>
+    .camera-container {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto;
+    }
+    .guide-rectangle {
+        position: absolute;
+        top: 10%;
+        left: 10%;
+        width: 80%;
+        height: 80%;
+        border: 3px solid #B7410E;
+        border-radius: 8px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+        z-index: 10;
+    }
+    .guide-text {
+        position: absolute;
+        top: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        background-color: rgba(183, 65, 14, 0.8);
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        z-index: 11;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
-    # Display uploaded image info
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Format", st.session_state.uploaded_image.format)
-    with col2:
-        st.metric("Size", f"{st.session_state.uploaded_image.size[0]} x {st.session_state.uploaded_image.size[1]}")
-    with col3:
-        st.metric("Mode", st.session_state.uploaded_image.mode)
+    # Camera input widget
+    camera_image = st.camera_input(
+        "Position your document within the guide rectangle and capture",
+        help="Align your Javanese script document within the red rectangle guide"
+    )
     
-    st.success("Image uploaded successfully!")
-else:
-    st.info("Please upload an image to get started")
-    st.session_state.uploaded_image = None
-    st.session_state.cropped_image = None
-    st.session_state.final_image = None
-    st.session_state.processed_image = None
+    if camera_image is not None:
+        # Load and store image from camera
+        st.session_state.uploaded_image = Image.open(camera_image)
+        
+        # Display captured image info
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Format", "JPEG")
+        with col2:
+            st.metric("Size", f"{st.session_state.uploaded_image.size[0]} x {st.session_state.uploaded_image.size[1]}")
+        with col3:
+            st.metric("Mode", st.session_state.uploaded_image.mode)
+        
+        st.success("Photo captured successfully!")
+
+# Handle case when no image is provided
+if st.session_state.uploaded_image is None:
+    if uploaded_file is None and camera_image is None:
+        st.info("Please upload an image or capture a photo to get started")
+        st.session_state.cropped_image = None
+        st.session_state.final_image = None
+        st.session_state.processed_image = None
 
 st.markdown("</div>", unsafe_allow_html=True)
 
