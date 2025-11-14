@@ -481,7 +481,7 @@ if st.session_state.uploaded_image is not None:
             st.rerun()
     
     with col2:
-        if st.button("Process As-Is", use_container_width=True):
+        if st.button("Direct Image Processing", use_container_width=True):
             st.session_state.show_cropper = False
             st.session_state.final_image = st.session_state.uploaded_image
             st.session_state.cropped_image = None
