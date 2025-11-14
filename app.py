@@ -1,5 +1,5 @@
 """
-JawaLens 2.0
+Brick Red Image Cropper - Modern Minimal Streamlit App
 ======================================================
 
 REQUIRED PACKAGES:
@@ -400,43 +400,70 @@ with tab1:
 with tab2:
     st.markdown("""
     <style>
-    .camera-container {
+    /* Camera guide box styles */
+    [data-testid="stCameraInput"] > div {
         position: relative;
-        width: 100%;
-        max-width: 640px;
-        margin: 0 auto;
     }
-    .guide-rectangle {
+    
+    [data-testid="stCameraInput"] video {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Guide box overlay */
+    [data-testid="stCameraInput"]::after {
+        content: '';
         position: absolute;
-        top: 10%;
-        left: 10%;
-        width: 80%;
-        height: 80%;
-        border: 3px solid #B7410E;
-        border-radius: 8px;
-        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        top: 15%;
+        left: 15%;
+        width: 70%;
+        height: 70%;
+        border: 4px solid #00FF00;
+        border-radius: 12px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
         pointer-events: none;
-        z-index: 10;
+        z-index: 2;
+        animation: pulse 2s infinite;
     }
-    .guide-text {
+    
+    @keyframes pulse {
+        0%, 100% {
+            border-color: #00FF00;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        50% {
+            border-color: #00DD00;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+    }
+    
+    /* Corner indicators */
+    [data-testid="stCameraInput"]::before {
+        content: 'Align document here';
         position: absolute;
-        top: 5%;
+        top: 12%;
         left: 50%;
         transform: translateX(-50%);
-        color: white;
-        background-color: rgba(183, 65, 14, 0.8);
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: 500;
-        z-index: 11;
+        color: #00FF00;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        z-index: 3;
+        pointer-events: none;
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
     }
     </style>
     """, unsafe_allow_html=True)
     
+    st.info("📸 Position your Javanese script document within the **green guide box** and click capture")
+    
     # Camera input widget
     camera_image = st.camera_input(
-        "Position your document within the guide rectangle and capture",
-        help="Align your Javanese script document within the red rectangle guide"
+        "Camera",
+        help="Align your Javanese script document within the green rectangle guide",
+        label_visibility="collapsed"
     )
     
     if camera_image is not None:
