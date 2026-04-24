@@ -215,13 +215,46 @@ st.markdown("""
         border-color: var(--red) !important;
     }
 
-    /* Selectbox */
-    [data-testid="stSelectbox"] > div > div {
+    /* Selectbox — input box */
+    [data-testid="stSelectbox"] > div > div,
+    [data-testid="stSelectbox"] > div > div > div {
         background-color: var(--beige-card) !important;
         border: 1px solid var(--border) !important;
         border-radius: 2px !important;
         font-family: 'DM Sans', sans-serif !important;
         font-size: 0.88rem !important;
+        color: var(--brown-text) !important;
+    }
+
+    /* Selectbox — dropdown popup */
+    [data-baseweb="popover"],
+    [data-baseweb="popover"] * {
+        background-color: var(--beige-card) !important;
+        color: var(--brown-text) !important;
+        font-family: 'DM Sans', sans-serif !important;
+    }
+
+    /* Selectbox — individual option */
+    [role="listbox"],
+    [role="option"],
+    li[role="option"] {
+        background-color: var(--beige-card) !important;
+        color: var(--brown-text) !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.88rem !important;
+    }
+
+    /* Selectbox — option hover */
+    [role="option"]:hover,
+    li[role="option"]:hover {
+        background-color: var(--beige-dark) !important;
+        color: var(--red) !important;
+    }
+
+    /* Selectbox — selected option highlight */
+    [aria-selected="true"][role="option"] {
+        background-color: rgba(122, 21, 0, 0.08) !important;
+        color: var(--red) !important;
     }
 
     /* File uploader */
