@@ -459,10 +459,17 @@ st.markdown("""
     <div class="section-title">Pilih Model</div>
 """, unsafe_allow_html=True)
 
+_model_keys = list(MODEL_OPTIONS.keys())
+_default_index = (
+    _model_keys.index(st.session_state.selected_model)
+    if st.session_state.selected_model in _model_keys
+    else 0
+)
+
 selected_model = st.selectbox(
     "Model yang digunakan",
-    options=list(MODEL_OPTIONS.keys()),
-    index=list(MODEL_OPTIONS.keys()).index(st.session_state.selected_model),
+    options=_model_keys,
+    index=_default_index,
     help="Pilih model KNN yang telah dilatih untuk transliterasi aksara Jawa"
 )
 
