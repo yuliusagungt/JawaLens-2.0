@@ -46,7 +46,7 @@ except ImportError:
 # ============================================================
 # MODEL LOADING FROM HUGGING FACE
 # ============================================================
-REPO_ID = "huggingface.co/yuliusat/JawaLens2.0/tree/main"
+REPO_ID = "yuliusat/JawaLens2.0/main"
 
 # Model options
 MODEL_OPTIONS = {
