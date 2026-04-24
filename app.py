@@ -173,7 +173,7 @@ st.markdown("""
     /* Buttons */
     .stButton > button {
         background-color: var(--red) !important;
-        color: #FFF8F5 !important;
+        color: var(--beige) !important;
         border: none !important;
         border-radius: 2px !important;
         padding: 0.65rem 1.8rem !important;
@@ -188,6 +188,12 @@ st.markdown("""
     .stButton > button:hover {
         background-color: var(--red-hover) !important;
         box-shadow: none !important;
+        color: var(--beige) !important;
+    }
+    .stButton > button p,
+    .stButton > button span,
+    .stButton > button div {
+        color: var(--beige) !important;
     }
 
     /* Download buttons */
