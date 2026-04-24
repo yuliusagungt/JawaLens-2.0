@@ -7,11 +7,6 @@ pip install streamlit streamlit-cropper pillow numpy opencv-python-headless jobl
 
 HOW TO RUN:
 streamlit run app.py
-
-DESCRIPTION:
-A beautiful, minimal image processing app with interactive cropping.
-Features a brick-red (#B7410E) and soft beige (#F5F0E1) color scheme.
-Includes JawaLens 2.0 model for Javanese script transliteration.
 """
 
 import streamlit as st
@@ -24,23 +19,14 @@ import tempfile
 import os
 import zipfile
 from huggingface_hub import hf_hub_download
-import backend  # Import all functions from backend.py
+import backend
 
-# Try to import streamlit-cropper, provide fallback instructions
 try:
     from streamlit_cropper import st_cropper
     CROPPER_AVAILABLE = True
 except ImportError:
     CROPPER_AVAILABLE = False
-    st.error("""
-    ⚠️ **Missing Required Package**
-    
-    Please install streamlit-cropper:
-    ```
-    pip install streamlit-cropper
-    ```
-    Then restart the app.
-    """)
+    st.error("Paket streamlit-cropper tidak ditemukan. Jalankan: pip install streamlit-cropper")
     st.stop()
 
 # ============================================================
@@ -48,16 +34,14 @@ except ImportError:
 # ============================================================
 REPO_ID = "yuliusat/JawaLens2"
 
-# Model options
 MODEL_OPTIONS = {
-    "Model 1: 281 Kelas, 500 data per kelas, n3": "Model1.pkl",
-    "Model 2: 281 Kelas, 500 data per kelas, n11": "Model2.pkl"
+    "Model 1 — 281 Kelas, 500 data/kelas, n=3": "Model1.pkl",
+    "Model 2 — 281 Kelas, 500 data/kelas, n=11": "Model2.pkl"
 }
 
 @st.cache_resource
 def load_model(model_filename):
-    """Load model from Hugging Face Hub with caching"""
-    with st.spinner(f"Loading model {model_filename}..."):
+    with st.spinner(f"Memuat model {model_filename}..."):
         try:
             hf_token = st.secrets.get("HF_TOKEN", None)
             MODEL_PATH = hf_hub_download(
@@ -66,10 +50,10 @@ def load_model(model_filename):
                 token=hf_token
             )
             model = joblib.load(MODEL_PATH)
-            st.success(f"Model {model_filename} loaded successfully!")
+            st.success(f"Model {model_filename} berhasil dimuat.")
             return model, MODEL_PATH
         except Exception as e:
-            st.error(f"Failed to load model: {e}")
+            st.error(f"Gagal memuat model: {e}")
             st.stop()
             return None, None
 
@@ -83,160 +67,250 @@ st.set_page_config(
 )
 
 # ============================================================
-# CUSTOM CSS - BRICK RED & BEIGE THEME
+# CUSTOM CSS — ELEGANT MINIMALIST
 # ============================================================
 st.markdown("""
 <style>
-    /* ── Warna utama ── */
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+
     :root {
-        --brick-red:   #8B1A00;   /* merah bata gelap */
-        --brick-mid:   #A52800;   /* merah bata tengah */
-        --brick-light: #C0390F;   /* merah bata terang */
-        --beige:       #F5F0E1;   /* background beige */
-        --beige-card:  #FDF8EF;   /* card sedikit lebih terang */
-        --dark-brown:  #3E2723;
-        --light-brown: #8D6E63;
-        --text-main:   #2C1A10;
+        --red:        #7A1500;
+        --red-mid:    #9C1F00;
+        --red-hover:  #5E1000;
+        --beige:      #F4EFE3;
+        --beige-card: #FAF7F1;
+        --beige-dark: #EDE6D6;
+        --brown-text: #2A1A10;
+        --muted:      #8A7060;
+        --border:     rgba(122, 21, 0, 0.15);
     }
 
-    /* ── Background seluruh halaman ── */
-    .stApp,
+    html, body, .stApp,
     [data-testid="stAppViewContainer"],
     [data-testid="stMain"] {
         background-color: var(--beige) !important;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--brown-text);
     }
 
-    /* ── Sidebar (jika terbuka) ── */
-    [data-testid="stSidebar"] {
-        background-color: #EDE8D8 !important;
-    }
-
-    /* ── Header / toolbar atas ── */
-    [data-testid="stHeader"] {
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"] {
         background-color: var(--beige) !important;
     }
 
-    /* ── Teks umum ── */
-    .stApp, .stMarkdown, p, li, label {
-        color: var(--text-main);
+    [data-testid="stSidebar"] {
+        background-color: var(--beige-dark) !important;
     }
 
-    /* ── Heading ── */
-    h1, h2, h3, h4 {
-        color: var(--brick-red) !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-weight: 700;
+    .block-container {
+        padding-top: 3rem !important;
+        padding-bottom: 4rem !important;
+        max-width: 900px !important;
     }
 
-    /* ── Card container ── */
-    .card {
+    /* Typography */
+    h1 {
+        font-family: 'Cormorant Garamond', Georgia, serif !important;
+        font-size: 2.8rem !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.5px;
+        color: var(--red) !important;
+        line-height: 1.15;
+    }
+    h2, h3 {
+        font-family: 'Cormorant Garamond', Georgia, serif !important;
+        font-weight: 600 !important;
+        color: var(--red) !important;
+    }
+    h4 {
+        font-family: 'DM Sans', sans-serif !important;
+        font-weight: 500 !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 1.8px !important;
+        text-transform: uppercase !important;
+        color: var(--muted) !important;
+    }
+    p, li, label, .stMarkdown {
+        font-family: 'DM Sans', sans-serif;
+        color: var(--brown-text);
+        font-weight: 300;
+        line-height: 1.7;
+    }
+
+    /* Section card */
+    .section {
         background: var(--beige-card);
-        padding: 2rem;
-        border-radius: 14px;
-        border-left: 5px solid var(--brick-red);
-        box-shadow: 0 3px 12px rgba(139, 26, 0, 0.12);
-        margin: 1rem 0;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 2rem 2.2rem;
+        margin: 1.4rem 0;
+    }
+    .section-label {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.68rem;
+        font-weight: 500;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.25rem;
+    }
+    .section-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.55rem;
+        font-weight: 600;
+        color: var(--red);
+        margin-bottom: 1.4rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--border);
     }
 
-    /* ── Tombol utama ── */
+    hr {
+        border: none;
+        border-top: 1px solid var(--border) !important;
+        margin: 1.5rem 0;
+    }
+
+    /* Buttons */
     .stButton > button {
-        background-color: var(--brick-red) !important;
-        color: #FFF5EE !important;
+        background-color: var(--red) !important;
+        color: #FFF8F5 !important;
         border: none !important;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        transition: background-color 0.25s ease, box-shadow 0.25s ease;
+        border-radius: 2px !important;
+        padding: 0.65rem 1.8rem !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.78rem !important;
+        font-weight: 500 !important;
+        letter-spacing: 1.2px !important;
+        text-transform: uppercase !important;
+        transition: background-color 0.2s ease !important;
+        box-shadow: none !important;
     }
     .stButton > button:hover {
-        background-color: var(--brick-mid) !important;
-        box-shadow: 0 4px 14px rgba(139, 26, 0, 0.35) !important;
-    }
-    .stButton > button:active {
-        background-color: var(--brick-light) !important;
+        background-color: var(--red-hover) !important;
+        box-shadow: none !important;
     }
 
-    /* ── Tombol download ── */
+    /* Download buttons */
     .stDownloadButton > button {
-        background-color: var(--light-brown) !important;
-        color: white !important;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 500;
-        transition: background-color 0.25s ease;
+        background-color: transparent !important;
+        color: var(--red) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 2px !important;
+        padding: 0.6rem 1.1rem !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.74rem !important;
+        font-weight: 500 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        transition: background-color 0.2s ease, border-color 0.2s ease !important;
     }
     .stDownloadButton > button:hover {
-        background-color: var(--dark-brown) !important;
+        background-color: rgba(122, 21, 0, 0.05) !important;
+        border-color: var(--red) !important;
     }
 
-    /* ── Selectbox & widget ── */
+    /* Selectbox */
     [data-testid="stSelectbox"] > div > div {
         background-color: var(--beige-card) !important;
-        border-color: var(--brick-red) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 2px !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.88rem !important;
     }
 
-    /* ── File uploader ── */
+    /* File uploader */
     [data-testid="stFileUploader"] {
         background-color: var(--beige-card) !important;
-        border: 2px dashed var(--brick-mid) !important;
-        border-radius: 10px;
+        border: 1px dashed rgba(122, 21, 0, 0.25) !important;
+        border-radius: 3px !important;
     }
 
-    /* ── Tab aktif ── */
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        color: var(--brick-red) !important;
-        border-bottom: 3px solid var(--brick-red) !important;
-        font-weight: 700;
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        background: transparent !important;
+        border-bottom: 1px solid var(--border) !important;
+        gap: 0 !important;
     }
     .stTabs [data-baseweb="tab"] {
-        color: var(--light-brown);
+        background: transparent !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.76rem !important;
+        font-weight: 400 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: var(--muted) !important;
+        padding: 0.6rem 1.4rem !important;
+        border: none !important;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        color: var(--red) !important;
+        font-weight: 500 !important;
+        border-bottom: 2px solid var(--red) !important;
     }
 
-    /* ── Alert / info box ── */
+    /* Alert */
     .stAlert {
-        background-color: rgba(139, 26, 0, 0.06) !important;
-        border-left: 4px solid var(--brick-red) !important;
-        border-radius: 6px;
+        background-color: rgba(122, 21, 0, 0.04) !important;
+        border: 1px solid var(--border) !important;
+        border-left: 3px solid var(--red) !important;
+        border-radius: 2px !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.86rem !important;
     }
 
-    /* ── Progress bar ── */
+    /* Progress */
     [data-testid="stProgressBar"] > div > div {
-        background-color: var(--brick-red) !important;
+        background-color: var(--red) !important;
+    }
+    [data-testid="stProgressBar"] > div {
+        background-color: var(--beige-dark) !important;
     }
 
-    /* ── Metric value ── */
+    /* Metric */
     [data-testid="stMetricValue"] {
-        color: var(--brick-red) !important;
-        font-weight: 700;
+        font-family: 'Cormorant Garamond', serif !important;
+        font-size: 2.1rem !important;
+        color: var(--red) !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.68rem !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: var(--muted) !important;
     }
 
-    /* ── Text area ── */
+    /* Text area */
     .stTextArea textarea {
         background-color: var(--beige-card) !important;
-        border-color: var(--brick-mid) !important;
-        color: var(--text-main) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 2px !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.9rem !important;
+        color: var(--brown-text) !important;
+        line-height: 1.8;
+    }
+    .stTextArea textarea:focus {
+        border-color: var(--red) !important;
+        box-shadow: none !important;
     }
 
-    /* ── Expander ── */
+    /* Expander */
     [data-testid="stExpander"] {
         background-color: var(--beige-card) !important;
-        border: 1px solid rgba(139, 26, 0, 0.2) !important;
-        border-radius: 8px;
+        border: 1px solid var(--border) !important;
+        border-radius: 2px !important;
     }
-
-    /* ── Divider ── */
-    hr {
-        border-color: var(--brick-red);
-        opacity: 0.25;
-    }
-
-    /* ── Spinner ── */
-    .stSpinner > div {
-        border-top-color: var(--brick-red) !important;
+    [data-testid="stExpander"] summary {
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.76rem !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: var(--muted) !important;
     }
 </style>
 """, unsafe_allow_html=True)
+
 
 # ============================================================
 # HELPER FUNCTIONS
@@ -340,48 +414,56 @@ def pil_to_bytes(image_pil, format="PNG"):
     buf.seek(0)
     return buf.getvalue()
 
-# ============================================================
-# SESSION STATE INITIALIZATION
-# ============================================================
-if 'uploaded_image' not in st.session_state:
-    st.session_state.uploaded_image = None
-if 'cropped_image' not in st.session_state:
-    st.session_state.cropped_image = None
-if 'final_image' not in st.session_state:
-    st.session_state.final_image = None
-if 'processed_image' not in st.session_state:
-    st.session_state.processed_image = None
-if 'show_cropper' not in st.session_state:
-    st.session_state.show_cropper = False
-if 'javanese_results' not in st.session_state:
-    st.session_state.javanese_results = None
-if 'processing_mode' not in st.session_state:
-    st.session_state.processing_mode = "simple"
-if 'selected_model' not in st.session_state:
-    st.session_state.selected_model = "Model 1: 281 Kelas, 500 data per kelas, n3"
-if 'model_path' not in st.session_state:
-    st.session_state.model_path = None
 
 # ============================================================
-# MAIN APP
+# SESSION STATE
 # ============================================================
+defaults = {
+    'uploaded_image': None,
+    'cropped_image': None,
+    'final_image': None,
+    'processed_image': None,
+    'show_cropper': False,
+    'javanese_results': None,
+    'processing_mode': 'simple',
+    'selected_model': list(MODEL_OPTIONS.keys())[0],
+    'model_path': None,
+}
+for k, v in defaults.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
 
-# Header
-st.markdown("<h1 style='text-align: center; margin-bottom: 0;'>JawaLens 2.0</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8D6E63; margin-bottom: 2rem; font-size: 1.05rem;'>Transliterasi Aksara Jawa ke Latin berbasis Machine Learning</p>", unsafe_allow_html=True)
-st.markdown("---")
+
+# ============================================================
+# HEADER
+# ============================================================
+st.markdown("""
+<div style="text-align:center; padding: 2rem 0 1.2rem;">
+    <h1>JawaLens 2.0</h1>
+    <p style="color:#8A7060; font-size:0.9rem; font-weight:300; letter-spacing:1px;
+              text-transform:uppercase; margin-top:0.5rem;">
+        Transliterasi Aksara Jawa ke Latin berbasis Machine Learning
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("<hr>", unsafe_allow_html=True)
+
 
 # ============================================================
 # MODEL SELECTION
 # ============================================================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("### 🧠 Pilih Model")
+st.markdown("""
+<div class="section">
+    <div class="section-label">Konfigurasi</div>
+    <div class="section-title">Pilih Model</div>
+""", unsafe_allow_html=True)
 
 selected_model = st.selectbox(
-    "Pilih model yang akan digunakan:",
+    "Model yang digunakan",
     options=list(MODEL_OPTIONS.keys()),
     index=list(MODEL_OPTIONS.keys()).index(st.session_state.selected_model),
-    help="Pilih model KNN yang telah dilatih untuk transliterasi"
+    help="Pilih model KNN yang telah dilatih untuk transliterasi aksara Jawa"
 )
 
 if selected_model != st.session_state.selected_model:
@@ -399,35 +481,39 @@ else:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# ============================================================
-# STEP 1: UPLOAD OR CAPTURE IMAGE
-# ============================================================
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("### 📸 Step 1: Upload atau Ambil Foto")
 
-tab1, tab2 = st.tabs(["📁 Upload File", "📷 Kamera"])
+# ============================================================
+# STEP 1 — INPUT GAMBAR
+# ============================================================
+st.markdown("""
+<div class="section">
+    <div class="section-label">Langkah 1</div>
+    <div class="section-title">Masukkan Gambar</div>
+""", unsafe_allow_html=True)
+
+tab1, tab2 = st.tabs(["Upload File", "Kamera"])
 
 with tab1:
     uploaded_file = st.file_uploader(
         "Pilih file gambar (PNG, JPG, JPEG)",
         type=["png", "jpg", "jpeg"],
-        help="Upload gambar aksara Jawa dari perangkat kamu"
+        help="Upload gambar aksara Jawa dari perangkat"
     )
     if uploaded_file is not None:
         st.session_state.uploaded_image = Image.open(uploaded_file)
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Format", st.session_state.uploaded_image.format)
+            st.metric("Format", st.session_state.uploaded_image.format or "—")
         with col2:
-            st.metric("Ukuran", f"{st.session_state.uploaded_image.size[0]} x {st.session_state.uploaded_image.size[1]}")
+            st.metric("Ukuran", f"{st.session_state.uploaded_image.size[0]} × {st.session_state.uploaded_image.size[1]}")
         with col3:
             st.metric("Mode", st.session_state.uploaded_image.mode)
-        st.success("Gambar berhasil diupload!")
+        st.success("Gambar berhasil dimuat.")
 
 with tab2:
     camera_image = st.camera_input(
         "Arahkan kamera ke dokumen aksara Jawa",
-        help="Pastikan tulisan terlihat jelas dan pencahayaan cukup"
+        help="Pastikan tulisan terlihat jelas dengan pencahayaan yang cukup"
     )
     if camera_image is not None:
         st.session_state.uploaded_image = Image.open(camera_image)
@@ -435,26 +521,30 @@ with tab2:
         with col1:
             st.metric("Format", "JPEG")
         with col2:
-            st.metric("Ukuran", f"{st.session_state.uploaded_image.size[0]} x {st.session_state.uploaded_image.size[1]}")
+            st.metric("Ukuran", f"{st.session_state.uploaded_image.size[0]} × {st.session_state.uploaded_image.size[1]}")
         with col3:
             st.metric("Mode", st.session_state.uploaded_image.mode)
-        st.success("Foto berhasil diambil!")
+        st.success("Foto berhasil diambil.")
 
 if st.session_state.uploaded_image is None:
     if uploaded_file is None and camera_image is None:
-        st.info("Upload gambar atau ambil foto untuk memulai.")
+        st.info("Upload gambar atau ambil foto untuk memulai proses transliterasi.")
         st.session_state.cropped_image = None
         st.session_state.final_image = None
         st.session_state.processed_image = None
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+
 # ============================================================
-# STEP 2: CROP OR PROCESS AS-IS
+# STEP 2 — CROP
 # ============================================================
 if st.session_state.uploaded_image is not None:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("### ✂️ Step 2: Crop atau Langsung Proses")
+    st.markdown("""
+    <div class="section">
+        <div class="section-label">Langkah 2</div>
+        <div class="section-title">Crop atau Langsung Proses</div>
+    """, unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -471,38 +561,46 @@ if st.session_state.uploaded_image is not None:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # ── Cropping Interface ──
     if st.session_state.show_cropper:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 🖼️ Pilih Area Crop")
-        st.info("Klik dan seret pada gambar untuk memilih area, lalu klik **Konfirmasi Crop**.")
+        st.markdown("""
+        <div class="section">
+            <div class="section-label">Area Seleksi</div>
+            <div class="section-title">Pilih Area Crop</div>
+        """, unsafe_allow_html=True)
+
+        st.info("Seret sudut atau tepi seleksi untuk menyesuaikan area, kemudian konfirmasi.")
 
         cropped_img = st_cropper(
             st.session_state.uploaded_image,
             realtime_update=True,
-            box_color='#8B1A00',
+            box_color='#7A1500',
             aspect_ratio=None,
             return_type='image'
         )
 
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
-            if st.button("✅ Konfirmasi Crop", use_container_width=True, type="primary"):
+            if st.button("Konfirmasi Crop", use_container_width=True, type="primary"):
                 st.session_state.cropped_image = cropped_img
                 st.session_state.final_image = cropped_img
                 st.session_state.show_cropper = False
-                st.success("Gambar berhasil di-crop!")
+                st.success("Area crop dikonfirmasi.")
                 st.rerun()
 
         st.markdown("</div>", unsafe_allow_html=True)
 
+
 # ============================================================
-# STEP 3: JAVANESE SCRIPT PROCESSING
+# STEP 3 — TRANSLITERASI
 # ============================================================
 if st.session_state.final_image is not None:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("### 🔍 Step 3: Transliterasi Aksara Jawa")
-    st.info(f"Model aktif: **{st.session_state.selected_model}**")
+    st.markdown("""
+    <div class="section">
+        <div class="section-label">Langkah 3</div>
+        <div class="section-title">Transliterasi Aksara Jawa</div>
+    """, unsafe_allow_html=True)
+
+    st.info(f"Model aktif: {st.session_state.selected_model}")
 
     temp_folder = tempfile.mkdtemp()
     output_folder = os.path.join(temp_folder, "JawaLens_Results")
@@ -511,15 +609,15 @@ if st.session_state.final_image is not None:
     status_text = st.empty()
 
     try:
-        status_text.text("Tahap 1/5: Preprocessing & Segmentasi...")
+        status_text.text("Tahap 1 / 5 — Preprocessing dan segmentasi...")
         progress_bar.progress(20)
-        status_text.text("Tahap 2/5: Filter noise...")
+        status_text.text("Tahap 2 / 5 — Filter noise...")
         progress_bar.progress(40)
-        status_text.text("Tahap 3/5: Crop & Normalisasi...")
+        status_text.text("Tahap 3 / 5 — Crop dan normalisasi...")
         progress_bar.progress(60)
-        status_text.text("Tahap 4/5: Ekstraksi Fitur...")
+        status_text.text("Tahap 4 / 5 — Ekstraksi fitur...")
         progress_bar.progress(80)
-        status_text.text("Tahap 5/5: Prediksi & Transliterasi...")
+        status_text.text("Tahap 5 / 5 — Prediksi dan transliterasi...")
 
         results = process_javanese_script(
             st.session_state.final_image,
@@ -529,18 +627,22 @@ if st.session_state.final_image is not None:
         st.session_state.javanese_results = results
 
         progress_bar.progress(100)
-        status_text.text("✅ Proses selesai!")
+        status_text.text("Selesai.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # ── Hasil Transliterasi ──
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 📄 Hasil Transliterasi")
+        # Hasil
+        st.markdown("""
+        <div class="section">
+            <div class="section-label">Keluaran</div>
+            <div class="section-title">Hasil Transliterasi</div>
+        """, unsafe_allow_html=True)
+
         st.image(st.session_state.final_image, caption="Gambar Aksara Jawa", use_container_width=True)
 
-        st.markdown("#### Hasil Latin:")
-        st.text_area("Transliterasi", results['transliteration'], height=200)
+        st.markdown("<h4>Teks Latin</h4>", unsafe_allow_html=True)
+        st.text_area("Transliterasi", results['transliteration'], height=200, label_visibility="collapsed")
 
-        st.markdown("#### Statistik:")
+        st.markdown("<h4>Statistik</h4>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("Total Baris", results['df_rescale']['row_id'].nunique())
@@ -548,45 +650,47 @@ if st.session_state.final_image is not None:
             st.metric("Total Karakter", len(results['df_rescale']))
         with col3:
             avg_chars = len(results['df_rescale']) / results['df_rescale']['row_id'].nunique()
-            st.metric("Karakter/Baris", f"{avg_chars:.1f}")
+            st.metric("Karakter / Baris", f"{avg_chars:.1f}")
         with col4:
             st.metric("Total Kata", len(results['transliteration'].split()))
+
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # ── Download ──
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 💾 Download Hasil")
+        # Download
+        st.markdown("""
+        <div class="section">
+            <div class="section-label">Ekspor</div>
+            <div class="section-title">Unduh Hasil</div>
+        """, unsafe_allow_html=True)
+
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             st.download_button(
-                "📝 Transliterasi (TXT)",
+                "Transliterasi (TXT)",
                 data=results['transliteration'].encode('utf-8'),
                 file_name="hasil_transliterasi.txt",
                 mime="text/plain",
                 use_container_width=True
             )
-
         with col2:
             st.download_button(
-                "📊 Fitur (CSV)",
+                "Fitur (CSV)",
                 data=results['test_features_df'].to_csv(index=False).encode('utf-8'),
                 file_name="hasil_fitur.csv",
                 mime="text/csv",
                 use_container_width=True
             )
-
         with col3:
             detail_df = results['df_rescale'][['row_id', 'col_id', 'start_row', 'end_row', 'start_col', 'end_col']].copy()
             detail_df['prediction'] = results['result_predict']
             st.download_button(
-                "🔎 Detail Prediksi (CSV)",
+                "Detail Prediksi (CSV)",
                 data=detail_df.to_csv(index=False).encode('utf-8'),
                 file_name="detail_prediksi.csv",
                 mime="text/csv",
                 use_container_width=True
             )
-
         with col4:
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -598,7 +702,7 @@ if st.session_state.final_image is not None:
                             zipf.write(full_path, arcname)
             zip_buffer.seek(0)
             st.download_button(
-                label="🖼️ Semua Gambar (ZIP)",
+                "Semua Gambar (ZIP)",
                 data=zip_buffer,
                 file_name="hasil_gambar_jawalens.zip",
                 mime="application/zip",
@@ -607,24 +711,30 @@ if st.session_state.final_image is not None:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        with st.expander("🔍 Detail Prediksi per Baris"):
+        with st.expander("Detail Prediksi per Baris"):
             for row_id in sorted(results['df_rescale']['row_id'].unique()):
                 row_data = results['df_rescale'][results['df_rescale']['row_id'] == row_id]
                 predictions_in_row = [results['result_predict'][i] for i in row_data.index]
-                st.markdown(f"**Baris {row_id}:** {' '.join(predictions_in_row)}")
+                st.markdown(f"**Baris {row_id}** &nbsp; {' · '.join(predictions_in_row)}")
 
     except Exception as e:
-        st.error(f"Error saat pemrosesan: {e}")
+        st.error(f"Terjadi kesalahan saat pemrosesan: {e}")
         import traceback
         st.code(traceback.format_exc())
+
 
 # ============================================================
 # FOOTER
 # ============================================================
-st.markdown("---")
+st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("""
-<div style='text-align: center; color: #8D6E63; padding: 2rem 0;'>
-    <p><strong style="color:#8B1A00;">JawaLens 2.0</strong> &nbsp;|&nbsp; Built with Streamlit</p>
-    <p style='font-size: 0.8rem;'>Transliterasi Aksara Jawa berbasis KNN · Zoning · Projection Profile · Hu Moments</p>
+<div style="text-align:center; padding: 1.5rem 0 2.5rem; color: #8A7060;">
+    <p style="font-family:'Cormorant Garamond',serif; font-size:1.15rem;
+              color:#7A1500; margin-bottom:0.4rem; font-weight:600;">
+        JawaLens 2.0
+    </p>
+    <p style="font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; margin:0;">
+        KNN &nbsp;&middot;&nbsp; Zoning &nbsp;&middot;&nbsp; Projection Profile &nbsp;&middot;&nbsp; Hu Moments
+    </p>
 </div>
 """, unsafe_allow_html=True)
